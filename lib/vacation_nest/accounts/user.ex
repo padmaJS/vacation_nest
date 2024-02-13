@@ -5,6 +5,7 @@ defmodule VacationNest.Accounts.User do
   schema "users" do
     field :email, :string
     field :phone_number, :string
+    field :role, Ecto.Enum, values: [:guest, :partner, :admin], default: :guest
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime

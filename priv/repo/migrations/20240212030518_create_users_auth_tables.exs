@@ -8,6 +8,7 @@ defmodule VacationNest.Repo.Migrations.CreateUsersAuthTables do
       add :email, :citext, null: false
       add :phone_number, :string, null: false
       add :hashed_password, :string, null: false
+      add :role, :string
       add :confirmed_at, :naive_datetime
       timestamps()
     end
