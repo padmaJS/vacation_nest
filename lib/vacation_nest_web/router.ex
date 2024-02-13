@@ -20,7 +20,7 @@ defmodule VacationNestWeb.Router do
   scope "/", VacationNestWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", HomeLive.Index, :home
   end
 
   # Other scopes may use custom stacks.

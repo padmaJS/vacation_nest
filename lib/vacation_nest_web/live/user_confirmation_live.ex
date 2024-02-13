@@ -11,7 +11,7 @@ defmodule VacationNestWeb.UserConfirmationLive do
       <.simple_form for={@form} id="confirmation_form" phx-submit="confirm_account">
         <.input field={@form[:token]} type="hidden" />
         <:actions>
-          <.button phx-disable-with="Confirming..." class="w-full">Confirm my account</.button>
+          <.button phx-disable-with="Confirming..." class="w-full bg-green-500 hover:bg-green-600  transition duration-300">Confirm my account</.button>
         </:actions>
       </.simple_form>
 
@@ -36,7 +36,7 @@ defmodule VacationNestWeb.UserConfirmationLive do
         {:noreply,
          socket
          |> put_flash(:info, "User confirmed successfully.")
-         |> redirect(to: ~p"/")}
+         |> redirect(to: ~p"/users/log_in")}
 
       :error ->
         # If there is a current user and the account was already confirmed,
