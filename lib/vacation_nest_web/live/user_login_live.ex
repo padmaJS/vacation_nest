@@ -26,7 +26,7 @@ defmodule VacationNestWeb.UserLoginLive do
           </.link>
         </:actions>
         <:actions>
-          <.button phx-disable-with="Signing in..." class="w-full">
+          <.button phx-disable-with="Signing in..." class="w-full  bg-green-500 hover:bg-green-600  transition duration-300">
             Sign in <span aria-hidden="true">→</span>
           </.button>
         </:actions>
