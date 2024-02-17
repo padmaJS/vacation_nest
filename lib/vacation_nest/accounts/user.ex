@@ -1,5 +1,5 @@
 defmodule VacationNest.Accounts.User do
-  use Ecto.Schema
+  use VacationNest.Schema
   import Ecto.Changeset
 
   schema "users" do
@@ -9,6 +9,8 @@ defmodule VacationNest.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
+
+    has_one :hotel, VacationNest.Hotels.Hotel
 
     timestamps()
   end
@@ -64,7 +66,9 @@ defmodule VacationNest.Accounts.User do
     |> validate_required([:password])
     |> validate_confirmation(:password, message: "does not match password")
     |> validate_length(:password, min: 8, max: 72)
-    |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
+    |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/,
+      message: "at least one digit or punctuation character"
+    )
     |> maybe_hash_password(opts)
   end
 
