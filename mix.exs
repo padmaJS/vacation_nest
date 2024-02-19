@@ -52,7 +52,8 @@ defmodule VacationNest.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:waffle, "~> 1.1"},
-      {:waffle_ecto, "~> 0.0.12"}
+      {:waffle_ecto, "~> 0.0.12"},
+      {:timex, "~> 3.7.11"}
     ]
   end
 

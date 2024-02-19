@@ -12,16 +12,19 @@ defmodule VacationNestWeb.PartnershipLive.Index do
     <.header class="text-center">
       Become a partner
       <:actions>
-        <.link patch={~p"/partnership/add_property"}>
-          <.button class="text-white bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-3 md:mr-0 mt-3">
-            Add Property
-          </.button>
-        </.link>
-        <.link :if={@current_user.hotel} patch={~p"/partnership/add_property/#{@hotel.id}/edit"}>
-          <.button class="text-white bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-3 md:mr-0 mt-3">
-            Edit Property
-          </.button>
-        </.link>
+        <%= if @has_hotel do %>
+          <.link patch={~p"/partnership/add_property/#{@hotel.id}/edit"}>
+            <.button class="text-white bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-3 md:mr-0 mt-3">
+              Edit Property
+            </.button>
+          </.link>
+        <% else %>
+          <.link patch={~p"/partnership/add_property"}>
+            <.button class="text-white bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-3 md:mr-0 mt-3">
+              Add Property
+            </.button>
+          </.link>
+        <% end %>
       </:actions>
     </.header>
     <.modal
@@ -33,7 +36,7 @@ defmodule VacationNestWeb.PartnershipLive.Index do
       <.live_component
         module={VacationNestWeb.PartnershipLive.AddProperty}
         action={@live_action}
-        id={@hotel.id || :new}
+        id={(@has_hotel && @hotel.id) || :new}
         title={@title}
         hotel={@hotel}
         patch={~p"/partnership"}
@@ -44,28 +47,41 @@ defmodule VacationNestWeb.PartnershipLive.Index do
   end
 
   @impl true
-  def mount(params, _session, socket) do
-    hotel = socket.assigns.current_user |> IO.inspect(limit: :infinity)
-    hotel = if params["hotel_id"], do: Hotels.get_hotel!(params["hotel_id"])
-    {:ok, socket |> assign(:current_page, :partnership) |> assign(:hotel, hotel)}
+  def mount(_params, _session, socket) do
+    hotel = socket.assigns.current_user |> Repo.preload(:hotel) |> Map.get(:hotel)
+
+    {:ok,
+     socket
+     |> assign(:current_page, :partnership)
+     |> assign(:has_hotel, hotel && true)
+     |> assign(:hotel, hotel)}
   end
 
   @impl true
   def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+    {:noreply, socket |> apply_action(socket.assigns.live_action, params)}
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:title, "New Partnership")
+    |> assign(:hotel, %Hotel{})
   end
 
   defp apply_action(socket, :edit, _) do
+    hotel = socket.assigns.current_user |> Repo.preload(:hotel) |> Map.get(:hotel)
+
     socket
     |> assign(:title, "Edit Partnership")
+    |> assign(:hotel, hotel)
   end
 
   defp apply_action(socket, _index, _params) do
     socket
+  end
+
+  @impl true
+  def handle_info({VacationNestWeb.PartnershipLive.AddProperty, {:saved, hotel}}, socket) do
+    {:noreply, assign(socket, :hotel, hotel) |> assign(:has_hotel, true)}
   end
 end

@@ -5,21 +5,18 @@ defmodule VacationNest.Hotels.Room do
   import Ecto.Changeset
 
   schema "rooms" do
-    field :name, :string
-    field :description, :string
     field :price, :float
-    # field :images, VacationNest.FileImage.Uploader.Type
+    field :room_number, :integer
+    field :status, Ecto.Enum, values: [:available, :unavailable], default: :available
     belongs_to :hotel, VacationNest.Hotels.Hotel
 
     timestamps()
   end
 
-  @attrs []
+  @attrs [:price, :room_number, :status, :hotel_id]
 
   def changeset(room, attrs) do
     room
     |> cast(attrs, @attrs)
-    |> validate_required([])
-    |> cast_attachments(attrs, [:image])
   end
 end

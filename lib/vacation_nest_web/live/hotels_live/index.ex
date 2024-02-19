@@ -1,4 +1,4 @@
-defmodule VacationNestWeb.HomeLive.Index do
+defmodule VacationNestWeb.HotelsLive.Index do
   use VacationNestWeb, :live_view
 
   alias VacationNest.Hotels
@@ -6,11 +6,7 @@ defmodule VacationNestWeb.HomeLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header class="text-center">
-      Welcome to Vacation Nest
-    </.header>
-
-    <.form for={@form} action={~p"/hotels"} method="get">
+    <.form for={@form} phx-change="validate_and_search">
       <.input
         field={@form[:location]}
         type="select"
@@ -40,6 +36,7 @@ defmodule VacationNestWeb.HomeLive.Index do
       <:col :let={{_id, hotel}} label="Verified"><%= hotel.verified %></:col>
       <:col :let={{_id, hotel}} label="Check in time"><%= hotel.check_in_time %></:col>
       <:col :let={{_id, hotel}} label="Check out time"><%= hotel.check_out_time %></:col>
+      <:col :let={{_id, hotel}} label="Price Per Room"><%= get_price_per_room(hotel) %></:col>
       <:action :let={{_id, hotel}}>
         <.link
           class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
@@ -53,18 +50,27 @@ defmodule VacationNestWeb.HomeLive.Index do
   end
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(%{"hotel" => hotel_params}, _session, socket) do
     today = Date.utc_today() |> Date.to_string()
 
     {:ok,
-     socket
-     |> assign(:current_page, :home)
-     |> assign(:today, today)
-     |> stream(:hotels, Hotels.list_hotels())
-     |> assign_form()}
+     socket      |> assign(:today, today)
+     |> stream(:hotels, Hotels.list_hotels(hotel_params)) |> assign_form(hotel_params)}
   end
 
-  defp assign_form(socket, changeset \\ %{}) do
+  defp assign_form(socket, changeset) do
     assign(socket, :form, to_form(changeset, as: :hotel))
+  end
+
+  @impl true
+  def handle_event("validate_and_search", %{"hotel" => hotel_params}, socket) do
+    {:noreply, socket}
+  end
+
+  defp get_price_per_room(hotel) do
+    hotel.rooms
+    |> Enum.at(0)
+    |> Map.get(:price)
+    |> :erlang.float_to_binary(decimals: 2)
   end
 end

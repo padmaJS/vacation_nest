@@ -5,7 +5,6 @@ defmodule VacationNest.Repo.Migrations.CreateHotelsRooms do
     create table(:hotels, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :name, :string
-      add :manager_id, references(:users, type: :uuid)
       add :rating, :float
       add :ratings_count, :integer
       add :location, :string
@@ -16,11 +15,12 @@ defmodule VacationNest.Repo.Migrations.CreateHotelsRooms do
       add :check_in_time, :time
       add :check_out_time, :time
       add :images, {:array, :string}
+      add :user_id, references(:users, type: :uuid)
 
       timestamps()
     end
 
-    create index(:hotels, [:manager_id])
+    create index(:hotels, [:user_id])
     create unique_index(:hotels, [:name])
   end
 end

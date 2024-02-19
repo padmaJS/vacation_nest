@@ -29,6 +29,9 @@ defmodule VacationNestWeb.Router do
 
       live "/", HomeLive.Index, :home
 
+      live "/hotels", HotelsLive.Index, :index
+      live "/hotels/:hotel_id/details", HotelsLive.Show, :show
+
       pipe_through [:require_authenticated_user]
 
       live "/partnership", PartnershipLive.Index, :home

@@ -36,7 +36,10 @@ defmodule VacationNestWeb.UserAuth do
       |> maybe_write_remember_me_cookie(token, params)
       |> redirect(to: user_return_to || signed_in_path(conn))
     else
-      redirect(conn, to: ~p"/users/log_in")
+      conn
+      |> redirect(to: ~p"/users/log_in")
+      |> clear_flash()
+      |> put_flash(:error, "Please confirm your account before continuing")
     end
   end
 

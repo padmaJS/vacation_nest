@@ -16,9 +16,9 @@ defmodule VacationNest.Hotels.Hotel do
     field :check_in_time, :time
     field :check_out_time, :time
 
-    belongs_to :manager, VacationNest.Accounts.User
+    belongs_to :user, VacationNest.Accounts.User
 
-    has_many :rooms, VacationNest.Hotels.Room
+    has_many :rooms, VacationNest.Hotels.Room, on_delete: :delete_all
     has_many :images, VacationNest.Hotels.Image
 
     timestamps()
@@ -33,7 +33,7 @@ defmodule VacationNest.Hotels.Hotel do
     :check_in_time,
     :check_out_time
   ]
-  @attrs [:ratings_count, :rating, :amenities, :manager_id] ++ @req_attrs
+  @attrs [:ratings_count, :rating, :amenities, :user_id] ++ @req_attrs
 
   def changeset(hotel, attrs) do
     hotel

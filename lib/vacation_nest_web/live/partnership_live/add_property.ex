@@ -20,7 +20,13 @@ defmodule VacationNestWeb.PartnershipLive.AddProperty do
         phx-submit="save"
       >
         <.input field={@form[:name]} type="text" label="Hotel Name" />
-        <.input field={@form[:location]} type="text" label="Location" />
+        <.input
+          field={@form[:location]}
+          type="select"
+          label="Location"
+          prompt="Select your location"
+          options={["Bhaktapur", "Kathmandu", "Lalitpur"]}
+        />
         <.input field={@form[:description]} type="textarea" label="Description" />
         <.input field={@form[:website]} type="url" label="Website" />
         <.input
@@ -28,10 +34,28 @@ defmodule VacationNestWeb.PartnershipLive.AddProperty do
           type="select"
           multiple
           label="Amenities"
-          options={["Free Wifi", "TV", "Parking Facility", "Power Backup", "CCTV", "Bar", "24/7 Checkin", "Attached Bathroom", "Security"]}
+          options={[
+            "Free Wifi",
+            "TV",
+            "Parking Facility",
+            "Power Backup",
+            "CCTV",
+            "Bar",
+            "24/7 Checkin",
+            "Attached Bathroom",
+            "Security"
+          ]}
         />
         <.input field={@form[:check_in_time]} type="time" label="Checkin Time" />
         <.input field={@form[:check_out_time]} type="time" label="Checkout Time" />
+        <.input field={@form[:number_of_rooms]} type="number" label="Number of rooms" value="1" />
+        <.input
+          field={@form[:price]}
+          type="number"
+          label="Price Per Room"
+          value="0.0"
+          step="0.5"
+        />
         <:actions>
           <.button
             class="text-white inline-flex items-center bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:focus:ring-emerald-800"
@@ -49,7 +73,8 @@ defmodule VacationNestWeb.PartnershipLive.AddProperty do
                 clip-rule="evenodd"
               >
               </path>
-            </svg>Add Property
+            </svg>
+            <%= if @action == :new, do: "Add Property", else: "Update Property" %>
           </.button>
           <.link
             patch={@patch}
@@ -103,7 +128,9 @@ defmodule VacationNestWeb.PartnershipLive.AddProperty do
   end
 
   defp save_hotel(socket, :new, hotel_params) do
-    case hotel_params |> Map.put("manager_id", socket.assigns.current_user.id) |> Hotels.create_hotel() do
+    case hotel_params
+         |> Map.put("user_id", socket.assigns.current_user.id)
+         |> Hotels.create_hotel() do
       {:ok, hotel} ->
         notify_parent({:saved, hotel})
 
