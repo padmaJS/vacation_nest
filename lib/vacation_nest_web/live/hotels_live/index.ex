@@ -36,11 +36,15 @@ defmodule VacationNestWeb.HotelsLive.Index do
       <:col :let={{_id, hotel}} label="Verified"><%= hotel.verified %></:col>
       <:col :let={{_id, hotel}} label="Check in time"><%= hotel.check_in_time %></:col>
       <:col :let={{_id, hotel}} label="Check out time"><%= hotel.check_out_time %></:col>
-      <:col :let={{_id, hotel}} label="Price Per Room"><%= get_price_per_room(hotel) %></:col>
+      <:col :let={{_id, hotel}} label="Price Per Room">
+        <%= Hotels.get_price_per_room(hotel) |> :erlang.float_to_binary(decimals: 2) %>
+      </:col>
       <:action :let={{_id, hotel}}>
         <.link
           class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-          navigate={~p"/hotels/#{hotel.id}/details"}
+          navigate={
+            ~p"/hotels/#{hotel.id}/details?check_in_day=#{@form[:check_in_day].value}&check_out_day=#{@form[:check_out_day].value}&number_of_rooms=#{@form[:number_of_rooms].value}"
+          }
         >
           View Details
         </.link>
@@ -67,12 +71,5 @@ defmodule VacationNestWeb.HotelsLive.Index do
   @impl true
   def handle_event("validate_and_search", %{"hotel" => hotel_params}, socket) do
     {:noreply, socket |> assign_form(hotel_params)}
-  end
-
-  defp get_price_per_room(hotel) do
-    hotel.rooms
-    |> Enum.at(0)
-    |> Map.get(:price)
-    |> :erlang.float_to_binary(decimals: 2)
   end
 end

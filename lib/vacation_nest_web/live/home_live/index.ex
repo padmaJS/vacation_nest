@@ -19,16 +19,29 @@ defmodule VacationNestWeb.HomeLive.Index do
         options={["Bhaktapur", "Kathmandu", "Lalitpur"]}
         required
       />
-      <.input field={@form[:check_in_day]} type="date" label="Checkin Day" required min={@today} />
+      <.input
+        field={@form[:check_in_day]}
+        type="date"
+        label="Checkin Day"
+        required
+        min={@today}
+        value={@today}
+      />
       <.input
         field={@form[:check_out_day]}
         type="date"
         label="Checkout Day"
         required
         min={@form[:check_in_day].value || @today}
+        value={@today}
       />
-      <% IO.inspect(@form[:check_in_day], label: "day") %>
-      <.input field={@form[:number_of_rooms]} type="number" label="Number of rooms" required />
+      <.input
+        field={@form[:number_of_rooms]}
+        type="number"
+        label="Number of rooms"
+        required
+        value="1"
+      />
 
       <button>Search</button>
     </.form>
