@@ -80,7 +80,7 @@ defmodule VacationNest.Hotels do
 
     available_rooms..String.to_integer(room_count)
     |> Enum.each(fn _ ->
-      total_rooms = count_total_rooms_for_hotel(hotel)
+      total_rooms = count_total_rooms_for_hotel(hotel) || 0
 
       attrs
       |> Map.put("hotel_id", hotel.id)
