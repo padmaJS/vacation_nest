@@ -28,6 +28,5 @@ defmodule VacationNestWeb.HotelsLive.Show do
     {:ok,
      socket
      |> assign(:hotel, hotel)}
-
   end
 end

@@ -9,7 +9,7 @@ defmodule VacationNest.Hotels do
   end
 
   def list_hotels(attrs) do
-    now = Timex.now("Asia/Kathmandu") |> DateTime.to_time
+    now = Timex.now("Asia/Kathmandu") |> DateTime.to_time()
     today = Date.utc_today()
 
     query =
@@ -17,7 +17,7 @@ defmodule VacationNest.Hotels do
       # |> where([h], h.verified == true)
       |> where([h], h.location == ^attrs["location"])
 
-      query =
+    query =
       if Date.from_iso8601!(attrs["check_in_day"]) == today do
         where(query, [h], h.check_in_time > ^now)
       else
@@ -82,8 +82,8 @@ defmodule VacationNest.Hotels do
         attrs
         |> Map.put("hotel_id", hotel.id)
         |> Map.put("room_number", room_num)
-      %Room{}
-      |> Room.changeset(attrs) |> Repo.insert()
+
+      %Room{} |> Room.changeset(attrs) |> Repo.insert()
     end)
 
     hotel

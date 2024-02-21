@@ -54,8 +54,10 @@ defmodule VacationNestWeb.HotelsLive.Index do
     today = Date.utc_today() |> Date.to_string()
 
     {:ok,
-     socket      |> assign(:today, today)
-     |> stream(:hotels, Hotels.list_hotels(hotel_params)) |> assign_form(hotel_params)}
+     socket
+     |> assign(:today, today)
+     |> stream(:hotels, Hotels.list_hotels(hotel_params))
+     |> assign_form(hotel_params)}
   end
 
   defp assign_form(socket, changeset) do
@@ -64,7 +66,7 @@ defmodule VacationNestWeb.HotelsLive.Index do
 
   @impl true
   def handle_event("validate_and_search", %{"hotel" => hotel_params}, socket) do
-    {:noreply, socket}
+    {:noreply, socket |> assign_form(hotel_params)}
   end
 
   defp get_price_per_room(hotel) do

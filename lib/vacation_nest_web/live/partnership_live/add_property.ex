@@ -49,13 +49,7 @@ defmodule VacationNestWeb.PartnershipLive.AddProperty do
         <.input field={@form[:check_in_time]} type="time" label="Checkin Time" />
         <.input field={@form[:check_out_time]} type="time" label="Checkout Time" />
         <.input field={@form[:number_of_rooms]} type="number" label="Number of rooms" value="1" />
-        <.input
-          field={@form[:price]}
-          type="number"
-          label="Price Per Room"
-          value="0.0"
-          step="0.5"
-        />
+        <.input field={@form[:price]} type="number" label="Price Per Room" value="0.0" step="0.5" />
         <:actions>
           <.button
             class="text-white inline-flex items-center bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:focus:ring-emerald-800"

@@ -10,7 +10,7 @@ defmodule VacationNestWeb.HomeLive.Index do
       Welcome to Vacation Nest
     </.header>
 
-    <.form for={@form} action={~p"/hotels"} method="get">
+    <.form for={@form} action={~p"/hotels"} method="get" phx-change="validate">
       <.input
         field={@form[:location]}
         type="select"
@@ -27,6 +27,7 @@ defmodule VacationNestWeb.HomeLive.Index do
         required
         min={@form[:check_in_day].value || @today}
       />
+      <% IO.inspect(@form[:check_in_day], label: "day") %>
       <.input field={@form[:number_of_rooms]} type="number" label="Number of rooms" required />
 
       <button>Search</button>
@@ -66,5 +67,10 @@ defmodule VacationNestWeb.HomeLive.Index do
 
   defp assign_form(socket, changeset \\ %{}) do
     assign(socket, :form, to_form(changeset, as: :hotel))
+  end
+
+  @impl true
+  def handle_event("validate", %{"hotel" => hotel_params}, socket) do
+    {:noreply, socket |> assign_form(hotel_params)}
   end
 end
