@@ -7,8 +7,8 @@ import Config
 # before starting your production server.
 config :vacation_nest, VacationNestWeb.Endpoint,
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
-  url: [host: "vacation-nest.gigalixirapp.com"],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  check_origin: ["https://vacation-nest.gigalixirapp.com", "https://vacation-nest.gigalixirapp.com:4000", "//vacation-nest.gigalixirapp.com:4000", "//vacation-nest.gigalixirapp.com"]
 
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: VacationNest.Finch
