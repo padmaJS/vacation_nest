@@ -1,5 +1,5 @@
 defmodule VacationNest.Accounts.UserToken do
-  use Ecto.Schema
+  use VacationNest.Schema
   import Ecto.Query
   alias VacationNest.Accounts.UserToken
 
