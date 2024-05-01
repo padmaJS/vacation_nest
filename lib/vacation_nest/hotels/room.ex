@@ -8,7 +8,11 @@ defmodule VacationNest.Hotels.Room do
     field :price, :float
     field :room_number, :integer
     field :status, Ecto.Enum, values: [:available, :unavailable], default: :available
+
     belongs_to :hotel, VacationNest.Hotels.Hotel
+
+    many_to_many :bookings, VacationNest.Hotels.Booking,
+      join_through: VacationNest.Hotels.BookingsRooms
 
     timestamps()
   end

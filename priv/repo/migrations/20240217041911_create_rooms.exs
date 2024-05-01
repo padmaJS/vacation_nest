@@ -4,7 +4,7 @@ defmodule VacationNest.Repo.Migrations.CreateRooms do
   def change do
     create table(:rooms, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :hotel_id, references(:hotels, type: :uuid)
+      add :hotel_id, references(:hotels, type: :uuid, on_delete: :delete_all)
       add :room_number, :integer
       add :price, :float
       add :status, :string

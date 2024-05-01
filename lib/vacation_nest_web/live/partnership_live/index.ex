@@ -48,7 +48,7 @@ defmodule VacationNestWeb.PartnershipLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    hotel = socket.assigns.current_user |> Repo.preload(:hotel) |> Map.get(:hotel)
+    hotel = socket.assigns.current_user |> Repo.preload(hotel: [:rooms]) |> Map.get(:hotel)
 
     {:ok,
      socket

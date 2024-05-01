@@ -7,6 +7,7 @@ defmodule VacationNest.Repo.Migrations.CreateHotelsRooms do
       add :name, :string
       add :rating, :float
       add :ratings_count, :integer
+      add :total_rating, :integer
       add :location, :string
       add :description, :text
       add :verified, :boolean, default: false
@@ -15,7 +16,7 @@ defmodule VacationNest.Repo.Migrations.CreateHotelsRooms do
       add :check_in_time, :time
       add :check_out_time, :time
       add :images, {:array, :string}
-      add :user_id, references(:users, type: :uuid)
+      add :user_id, references(:users, type: :uuid, on_delete: :delete_all)
 
       timestamps()
     end

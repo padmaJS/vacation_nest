@@ -1,7 +1,7 @@
 defmodule VacationNestWeb.PartnershipLive.AddProperty do
   use VacationNestWeb, :live_component
 
-  alias VacationNest.Hotels
+  alias VacationNest.{Hotels, Repo}
 
   @impl true
   def render(assigns) do
@@ -20,6 +20,11 @@ defmodule VacationNestWeb.PartnershipLive.AddProperty do
         phx-submit="save"
       >
         <.input field={@form[:name]} type="text" label="Hotel Name" />
+        <label class="block text-sm font-semibold leading-6 text-zinc-800">Hotel Images</label>
+        <.live_file_input
+            upload={@uploads.hotel_images}
+            class="!mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+          />
         <.input
           field={@form[:location]}
           type="select"
@@ -48,8 +53,8 @@ defmodule VacationNestWeb.PartnershipLive.AddProperty do
         />
         <.input field={@form[:check_in_time]} type="time" label="Checkin Time" />
         <.input field={@form[:check_out_time]} type="time" label="Checkout Time" />
-        <.input field={@form[:number_of_rooms]} type="number" label="Number of rooms" value="1" />
-        <.input field={@form[:price]} type="number" label="Price Per Room" value="0.0" step="0.5" />
+        <.input field={@form[:number_of_rooms]} type="number" label="Number of rooms" />
+        <.input field={@form[:price]} type="number" label="Price Per Room" step="0.5" />
         <:actions>
           <.button
             class="text-white inline-flex items-center bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:focus:ring-emerald-800"
@@ -89,7 +94,11 @@ defmodule VacationNestWeb.PartnershipLive.AddProperty do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign_form(changeset)}
+     |> assign_form(changeset)
+     |> allow_upload(:hotel_images,
+     accept: ~w(.jpg .jpeg .png),
+     max_entries: 5
+   )}
   end
 
   @impl true
@@ -107,7 +116,7 @@ defmodule VacationNestWeb.PartnershipLive.AddProperty do
   end
 
   defp save_hotel(socket, :edit, hotel_params) do
-    case Hotels.update_hotel(socket.assigns.hotel, hotel_params) do
+    case Hotels.update_hotel(socket.assigns.hotel |> Repo.preload(:rooms), hotel_params) do
       {:ok, hotel} ->
         notify_parent({:saved, hotel})
 

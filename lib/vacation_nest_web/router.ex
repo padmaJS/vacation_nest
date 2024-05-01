@@ -37,6 +37,10 @@ defmodule VacationNestWeb.Router do
       live "/partnership", PartnershipLive.Index, :home
       live "/partnership/add_property", PartnershipLive.Index, :new
       live "/partnership/add_property/:hotel_id/edit", PartnershipLive.Index, :edit
+
+      live "/hotels/:hotel_id/book", HotelsLive.Show, :book
+      live "/hotels/:hotel_id/add_review", HotelsLive.Show, :add_review
+      live "/hotels/:hotel_id/edit_review/:review_id", HotelsLive.Show, :edit_review
     end
   end
 

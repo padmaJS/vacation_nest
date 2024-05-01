@@ -6,8 +6,8 @@ defmodule VacationNest.Repo.Migrations.CreateBookingsRooms do
       add :id, :binary_id, primary_key: true
       add :booking_id, references(:bookings, type: :uuid)
       add :room_id, references(:rooms, type: :uuid)
-    end
 
-    create unique_index(:bookings_rooms, [:booking_id, :room_id])
+      timestamps()
+    end
   end
 end

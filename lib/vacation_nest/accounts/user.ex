@@ -12,6 +12,8 @@ defmodule VacationNest.Accounts.User do
 
     has_one :hotel, VacationNest.Hotels.Hotel
 
+    has_many :reviews, VacationNest.Hotels.Review
+
     timestamps()
   end
 
