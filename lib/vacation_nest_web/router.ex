@@ -29,18 +29,14 @@ defmodule VacationNestWeb.Router do
 
       live "/", HomeLive.Index, :home
 
-      live "/hotels", HotelsLive.Index, :index
-      live "/hotels/:hotel_id/details", HotelsLive.Show, :show
+      live "/hotel/check", HotelsLive.Index, :index
+      live "/hotel/about", HotelsLive.Show, :show
 
       pipe_through [:require_authenticated_user]
 
-      live "/partnership", PartnershipLive.Index, :home
-      live "/partnership/add_property", PartnershipLive.Index, :new
-      live "/partnership/add_property/:hotel_id/edit", PartnershipLive.Index, :edit
-
-      live "/hotels/:hotel_id/book", HotelsLive.Show, :book
-      live "/hotels/:hotel_id/add_review", HotelsLive.Show, :add_review
-      live "/hotels/:hotel_id/edit_review/:review_id", HotelsLive.Show, :edit_review
+      live "/hotel/book", HotelsLive.Show, :book
+      live "/hotel/add_review", HotelsLive.Show, :add_review
+      live "/hotel/edit_review/:review_id", HotelsLive.Show, :edit_review
     end
   end
 

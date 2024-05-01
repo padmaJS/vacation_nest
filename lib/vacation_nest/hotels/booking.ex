@@ -9,7 +9,6 @@ defmodule VacationNest.Hotels.Booking do
     field :status, Ecto.Enum, values: [:confirmed, :on_going, :completed, :cancelled], default: :confirmed
 
     belongs_to :user, VacationNest.Accounts.User
-    belongs_to :hotel, VacationNest.Hotels.Hotel
 
     many_to_many :rooms, VacationNest.Hotels.Room, join_through: VacationNest.Hotels.BookingsRooms
 

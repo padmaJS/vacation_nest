@@ -7,7 +7,6 @@ defmodule VacationNest.Hotels.Image do
   schema "hotel_images" do
     field :image, VacationNest.FileImage.Type
 
-    belongs_to :hotel, VacationNest.Hotels.Hotel
     timestamps()
   end
 

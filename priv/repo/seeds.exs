@@ -19,7 +19,7 @@ now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
   phone_number: "0",
   confirmed_at: now
 }
-|> Repo.insert()
+|> Repo.insert!()
 
 %VacationNest.Accounts.User{
   email: "guest1@gmail.com",
@@ -28,37 +28,28 @@ now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
   phone_number: "1",
   confirmed_at: now
 }
-|> Repo.insert()
-
-%VacationNest.Hotels.Hotel{
-  name: "The Ivy",
-  rating: 4.7,
-  ratings_count: 5,
-  total_rating: 22,
-  location: "Kathmandu",
-  description: "Awesome",
-  amenities: ["Free Wifi", "TV"],
-  website: "https://www.theivy.com/",
-  check_in_time: ~T[14:00:00],
-  check_out_time: ~T[12:00:00],
-  verified: true,
-  rooms: [
-    %VacationNest.Hotels.Room{
-      price: 1000.0,
-      room_number: 1
-    },
-    %VacationNest.Hotels.Room{
-      price: 1000.0,
-      room_number: 2
-    },
-    %VacationNest.Hotels.Room{
-      price: 1000.0,
-      room_number: 3
-    },
-    %VacationNest.Hotels.Room{
-      price: 1000.0,
-      room_number: 4
-    }
-  ]
-}
 |> Repo.insert!()
+
+[
+  %VacationNest.Hotels.Room{
+    price: 1000.0,
+    room_number: 1,
+    room_type: :single
+  },
+  %VacationNest.Hotels.Room{
+    price: 1000.0,
+    room_number: 2,
+    room_type: :single
+  },
+  %VacationNest.Hotels.Room{
+    price: 2000.0,
+    room_number: 3,
+    room_type: :double
+  },
+  %VacationNest.Hotels.Room{
+    price: 2000.0,
+    room_number: 4,
+    room_type: :double
+  }
+]
+|> Enum.each(&Repo.insert!(&1))

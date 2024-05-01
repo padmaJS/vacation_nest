@@ -7,9 +7,8 @@ defmodule VacationNest.Hotels.Room do
   schema "rooms" do
     field :price, :float
     field :room_number, :integer
+    field :room_type, Ecto.Enum, values: [:single, :double], default: :single
     field :status, Ecto.Enum, values: [:available, :unavailable], default: :available
-
-    belongs_to :hotel, VacationNest.Hotels.Hotel
 
     many_to_many :bookings, VacationNest.Hotels.Booking,
       join_through: VacationNest.Hotels.BookingsRooms
@@ -17,7 +16,7 @@ defmodule VacationNest.Hotels.Room do
     timestamps()
   end
 
-  @attrs [:price, :room_number, :status, :hotel_id]
+  @attrs [:price, :room_number, :status]
 
   def changeset(room, attrs) do
     room

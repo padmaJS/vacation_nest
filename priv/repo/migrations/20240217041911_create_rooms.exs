@@ -4,8 +4,8 @@ defmodule VacationNest.Repo.Migrations.CreateRooms do
   def change do
     create table(:rooms, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :hotel_id, references(:hotels, type: :uuid, on_delete: :delete_all)
       add :room_number, :integer
+      add :room_type, :string
       add :price, :float
       add :status, :string
       add :images, {:array, :string}
@@ -13,7 +13,6 @@ defmodule VacationNest.Repo.Migrations.CreateRooms do
       timestamps()
     end
 
-    create index(:rooms, [:hotel_id])
-    create unique_index(:rooms, [:hotel_id, :room_number])
+    create unique_index(:rooms, [:room_number])
   end
 end
