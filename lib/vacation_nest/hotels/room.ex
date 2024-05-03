@@ -5,10 +5,10 @@ defmodule VacationNest.Hotels.Room do
   import Ecto.Changeset
 
   schema "rooms" do
-    field :price, :float
     field :room_number, :integer
-    field :room_type, Ecto.Enum, values: [:single, :double], default: :single
     field :status, Ecto.Enum, values: [:available, :unavailable], default: :available
+
+    belongs_to :room_type, VacationNest.Hotels.RoomType
 
     many_to_many :bookings, VacationNest.Hotels.Booking,
       join_through: VacationNest.Hotels.BookingsRooms

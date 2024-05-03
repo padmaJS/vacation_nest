@@ -56,7 +56,6 @@ defmodule VacationNestWeb.HotelsLive.Review do
       socket.assigns.action,
       %{"rating" => rating, "comment" => comment}
       |> Map.put("user_id", socket.assigns.current_user.id)
-      |> Map.put("hotel_id", socket.assigns.hotel.id)
     )
   end
 

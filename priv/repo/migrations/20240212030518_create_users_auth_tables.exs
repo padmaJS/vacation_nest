@@ -8,6 +8,9 @@ defmodule VacationNest.Repo.Migrations.CreateUsersAuthTables do
       add :id, :binary_id, primary_key: true
       add :email, :citext, null: false
       add :phone_number, :string, null: false
+      add :profile_image, :string
+      add :name, :string
+      add :gender, :string
       add :hashed_password, :string, null: false
       add :role, :string
       add :confirmed_at, :naive_datetime

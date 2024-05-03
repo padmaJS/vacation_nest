@@ -350,4 +350,15 @@ defmodule VacationNest.Accounts do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
+
+  def change_user(user, attrs) do
+    user
+    |> User.changeset(attrs)
+  end
+
+  def update_user(user, attrs) do
+    user
+    |> User.changeset(attrs)
+    |> Repo.update()
+  end
 end

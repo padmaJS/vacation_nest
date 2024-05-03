@@ -1,9 +1,6 @@
 defmodule VacationNestWeb.HomeLive.Index do
   use VacationNestWeb, :live_view
 
-  import VacationNest.DisplayHelper
-  alias VacationNest.Hotels
-
   @impl true
   def render(assigns) do
     ~H"""
@@ -62,11 +59,11 @@ defmodule VacationNestWeb.HomeLive.Index do
   end
 
   defp assign_form(socket, changeset \\ %{}) do
-    assign(socket, :form, to_form(changeset, as: :hotel))
+    assign(socket, :form, to_form(changeset))
   end
 
   @impl true
-  def handle_event("validate", %{"hotel" => hotel_params}, socket) do
+  def handle_event("validate", hotel_params, socket) do
     {:noreply, socket |> assign_form(hotel_params)}
   end
 end

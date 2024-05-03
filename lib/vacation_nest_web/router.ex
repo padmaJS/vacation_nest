@@ -34,7 +34,7 @@ defmodule VacationNestWeb.Router do
 
       pipe_through [:require_authenticated_user]
 
-      live "/hotel/book", HotelsLive.Show, :book
+      live "/hotel/book", HotelsLive.Index, :book
       live "/hotel/add_review", HotelsLive.Show, :add_review
       live "/hotel/edit_review/:review_id", HotelsLive.Show, :edit_review
     end

@@ -4,8 +4,11 @@ defmodule VacationNest.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :name, :string
     field :phone_number, :string
-    field :role, Ecto.Enum, values: [:guest, :partner, :admin], default: :guest
+    field :profile_image, :string
+    field :gender, :string
+    field :role, Ecto.Enum, values: [:guest, :staff, :admin], default: :guest
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
@@ -38,9 +41,22 @@ defmodule VacationNest.Accounts.User do
       submitting the form), this option can be set to `false`.
       Defaults to `true`.
   """
+  def changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :name, :profile_image, :phone_number, :gender])
+    |> validate_required([:email, :name, :phone_number, :gender])
+    |> maybe_validate_phone_number(attrs)
+  end
+
+  defp maybe_validate_phone_number(changeset, attrs) do
+    changeset
+    |> validate_format(:phone_number, ~r/^98[0-9]{8}$/, message: "must be a valid phone number")
+    |> unique_constraint(:phone_number)
+  end
+
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password, :phone_number])
+    |> cast(attrs, [:email, :name, :profile_image, :password, :phone_number])
     |> validate_email(opts)
     |> validate_password(opts)
     |> validate_phone_number

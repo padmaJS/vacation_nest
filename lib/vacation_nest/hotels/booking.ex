@@ -6,7 +6,10 @@ defmodule VacationNest.Hotels.Booking do
     field :total_amount, :float
     field :check_in_day, :date
     field :check_out_day, :date
-    field :status, Ecto.Enum, values: [:confirmed, :on_going, :completed, :cancelled], default: :confirmed
+
+    field :status, Ecto.Enum,
+      values: [:requested, :confirmed, :on_going, :completed, :cancelled],
+      default: :requested
 
     belongs_to :user, VacationNest.Accounts.User
 
@@ -17,7 +20,7 @@ defmodule VacationNest.Hotels.Booking do
 
   def changeset(booking, attrs) do
     booking
-    |> cast(attrs, [:user_id, :hotel_id, :total_amount, :check_in_day, :check_out_day])
-    |> validate_required([:user_id, :hotel_id, :total_amount, :check_in_day, :check_out_day])
+    |> cast(attrs, [:user_id, :total_amount, :check_in_day, :check_out_day, :status])
+    |> validate_required([:user_id, :total_amount, :check_in_day, :check_out_day])
   end
 end

@@ -9,6 +9,7 @@ defmodule VacationNest.Repo.Migrations.CreateRooms do
       add :price, :float
       add :status, :string
       add :images, {:array, :string}
+      add :room_type_id, references(:room_types, type: :uuid)
 
       timestamps()
     end
