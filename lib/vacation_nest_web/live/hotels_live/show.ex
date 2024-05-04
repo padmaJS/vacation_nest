@@ -9,30 +9,30 @@ defmodule VacationNestWeb.HotelsLive.Show do
   def render(assigns) do
     ~H"""
     <!-- lib/my_app_web/live/about_live.ex -->
-      <div class="bg-gray-100 min-h-screen flex items-center justify-center">
-        <div class="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
-          <h1 class="text-3xl font-semibold mb-4">VacationNest</h1>
-          <p class="text-gray-600 mb-4">Your tranquil escape in the heart of nature.</p>
-          <div class="mb-4">
-            <h2 class="text-lg font-semibold mb-2">Location</h2>
-            <p class="text-gray-600">Nestled amidst lush forests, near the serene lake.</p>
-          </div>
-          <div class="mb-4">
-            <h2 class="text-lg font-semibold mb-2">Amenities</h2>
-            <ul class="list-disc list-inside text-gray-600">
-              <li>Infinity pool with mountain views</li>
-              <li>Spa and wellness center</li>
-              <li>Hiking trails</li>
-              <li>Restaurant serving farm-to-table cuisine</li>
-            </ul>
-          </div>
-          <div>
-            <h2 class="text-lg font-semibold mb-2">Check-in & Check-out</h2>
-            <p class="text-gray-600">Check-in: 3:00 PM</p>
-            <p class="text-gray-600">Check-out: 11:00 AM</p>
-          </div>
+    <div class="bg-gray-100 min-h-screen flex items-center justify-center">
+      <div class="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
+        <h1 class="text-3xl font-semibold mb-4">VacationNest</h1>
+        <p class="text-gray-600 mb-4">Your tranquil escape in the heart of nature.</p>
+        <div class="mb-4">
+          <h2 class="text-lg font-semibold mb-2">Location</h2>
+          <p class="text-gray-600">Nestled amidst lush forests, near the serene lake.</p>
+        </div>
+        <div class="mb-4">
+          <h2 class="text-lg font-semibold mb-2">Amenities</h2>
+          <ul class="list-disc list-inside text-gray-600">
+            <li>Infinity pool with mountain views</li>
+            <li>Spa and wellness center</li>
+            <li>Hiking trails</li>
+            <li>Restaurant serving farm-to-table cuisine</li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold mb-2">Check-in & Check-out</h2>
+          <p class="text-gray-600">Check-in: 3:00 PM</p>
+          <p class="text-gray-600">Check-out: 11:00 AM</p>
         </div>
       </div>
+    </div>
 
     <div class="flex flex-col bg-gray-100 p-8 rounded-lg shadow-md">
       <div class="flex flex-row justify-between items-center">

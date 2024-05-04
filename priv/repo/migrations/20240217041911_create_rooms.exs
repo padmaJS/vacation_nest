@@ -5,10 +5,7 @@ defmodule VacationNest.Repo.Migrations.CreateRooms do
     create table(:rooms, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :room_number, :integer
-      add :room_type, :string
-      add :price, :float
       add :status, :string
-      add :images, {:array, :string}
       add :room_type_id, references(:room_types, type: :uuid)
 
       timestamps()

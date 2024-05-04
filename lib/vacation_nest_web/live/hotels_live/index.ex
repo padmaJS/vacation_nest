@@ -1,8 +1,6 @@
 defmodule VacationNestWeb.HotelsLive.Index do
   use VacationNestWeb, :live_view
 
-  import VacationNest.DisplayHelper
-
   alias VacationNest.Rooms
 
   @impl true
@@ -18,16 +16,18 @@ defmodule VacationNestWeb.HotelsLive.Index do
           </tr>
         </thead>
         <tbody>
-          <%= for {room_type, count} <- @rooms do %>
+          <%= for {room_type, count, price} <- @rooms do %>
             <tr class="border-b border-gray-200 hover:bg-gray-100">
               <td class="py-4 px-6"><%= room_type %></td>
               <td class="py-4 px-6"><%= count %></td>
-              <td class="py-4 px-6"><%= Rooms.get_price_for_room_type(room_type) %></td>
+              <td class="py-4 px-6">
+                <%= price %>
+              </td>
             </tr>
           <% end %>
         </tbody>
       </table>
-      <.link patch={~p"/hotel/book?check_in_day=#{@check_in_day}&check_out_day=#{@check_out_day}"}>
+      <.link navigate={~p"/hotel/book?check_in_day=#{@check_in_day}&check_out_day=#{@check_out_day}"}>
         Book room?
       </.link>
     <% else %>
@@ -61,7 +61,13 @@ defmodule VacationNestWeb.HotelsLive.Index do
         _session,
         socket
       ) do
-    rooms = Rooms.list_room_types_with_room_count(params)
+    rooms =
+      Rooms.list_room_types_with_room_count(params)
+      |> Enum.map(fn {room_type, count} ->
+        {room_type, count, Rooms.get_price_for_room_type(room_type)}
+      end)
+      |> Enum.sort_by(fn {_room_type, _count, price} -> price.amount end)
+
     rooms_available? = Rooms.check_room_availability?(params)
 
     {:ok,

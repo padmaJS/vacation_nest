@@ -5,7 +5,7 @@ defmodule VacationNest.Hotels.RoomType do
 
   schema "room_types" do
     field :type, Ecto.Enum, values: [:single, :double, :triple]
-    field :price, :float
+    field :price, Money.Ecto.Amount.Type
 
     has_many :rooms, VacationNest.Hotels.Room
 

@@ -17,7 +17,8 @@ now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
   role: :admin,
   hashed_password: Bcrypt.hash_pwd_salt("admin"),
   phone_number: "0",
-  confirmed_at: now
+  confirmed_at: now,
+  profile_image: "https://picsum.photos/200"
 }
 |> Repo.insert!()
 
@@ -26,28 +27,30 @@ now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
   role: :guest,
   hashed_password: Bcrypt.hash_pwd_salt("guest"),
   phone_number: "1",
-  confirmed_at: now
+  confirmed_at: now,
+  profile_image: "https://picsum.photos/200"
 }
 |> Repo.insert!()
 
 single =
   %VacationNest.Hotels.RoomType{
     type: :single,
-    price: 1000.0
+    price: Money.new(100_000)
   }
   |> Repo.insert!()
 
 double =
   %VacationNest.Hotels.RoomType{
     type: :double,
-    price: 2000.0
+    price: Money.new(200_000)
   }
   |> Repo.insert!()
 
 %VacationNest.Hotels.RoomType{
   type: :triple,
-  price: 3000.0
-} |> Repo.insert!()
+  price: Money.new(300_000)
+}
+|> Repo.insert!()
 
 [
   %VacationNest.Hotels.Room{

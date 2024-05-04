@@ -48,7 +48,7 @@ defmodule VacationNest.Accounts.User do
     |> maybe_validate_phone_number(attrs)
   end
 
-  defp maybe_validate_phone_number(changeset, attrs) do
+  defp maybe_validate_phone_number(changeset, _attrs) do
     changeset
     |> validate_format(:phone_number, ~r/^98[0-9]{8}$/, message: "must be a valid phone number")
     |> unique_constraint(:phone_number)

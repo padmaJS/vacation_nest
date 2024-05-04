@@ -3,7 +3,7 @@ defmodule VacationNest.Hotels.Booking do
   import Ecto.Changeset
 
   schema "bookings" do
-    field :total_amount, :float
+    field :total_amount, Money.Ecto.Amount.Type
     field :check_in_day, :date
     field :check_out_day, :date
 

@@ -44,7 +44,7 @@ defmodule VacationNestWeb.UserSettingsLive do
                 </button>
               </figure>
             </article>
-            <.error :for={err <- upload_errors(@uploads.profile_image, entry)} class="!mt-0">
+            <.error :for={err <- upload_errors(@uploads.profile_image, entry)}>
               <%= error_to_string(err) %>
             </.error>
           <% end %>
@@ -193,7 +193,7 @@ defmodule VacationNestWeb.UserSettingsLive do
         else: user_params
 
     case Accounts.update_user(user, user_params) do
-      {:ok, user} ->
+      {:ok, _user} ->
         {:noreply,
          socket
          |> put_flash(:info, "Profile updated successfully")}

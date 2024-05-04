@@ -12,13 +12,18 @@ defmodule VacationNestWeb.BookingsLive.Index do
         <%= booking.user.email %>
       </:col>
       <:col :let={booking} label="Amount"><%= booking.total_amount %></:col>
+      <:col :let={booking} label="Room">
+        <%= Enum.at(booking.rooms, 0) |> Map.get(:room_type) |> Map.get(:type) %> X <%= Enum.count(
+          booking.rooms
+        ) %>
+      </:col>
       <:col :let={booking} label="Check in day"><%= booking.check_in_day %></:col>
       <:col :let={booking} label="Check out day"><%= booking.check_out_day %></:col>
       <:col :let={booking} label="Status"><%= booking.status %></:col>
       <:col :let={booking} label="Timestamp"><%= format_date(booking.updated_at) %></:col>
       <:action :let={booking}>
         <.button
-        :if={@current_user.role == :admin}
+          :if={@current_user.role == :admin}
           class="text-white inline-flex items-center bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:focus:ring-emerald-800"
           phx-disable-with="Accepting..."
           phx-click="accept_booking"
@@ -27,7 +32,10 @@ defmodule VacationNestWeb.BookingsLive.Index do
           Accept
         </.button>
         <.button
-        :if={booking.status == :requested}
+          :if={
+            (@current_user.role == :admin and booking.status in [:requested, :confirmed, :on_going]) or
+              booking.status == :requested
+          }
           phx-disable-with="Cancelling..."
           phx-click="cancel_booking"
           phx-value-id={booking.id}

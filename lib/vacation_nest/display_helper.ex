@@ -8,7 +8,10 @@ defmodule VacationNest.DisplayHelper do
     |> Timex.format!("%y/%m/%d", :strftime)
   end
 
-  def format_date(date_time) do
-    Timex.format!(date_time, "%b %e, %Y at %H:%M:%S %p", :strftime)
+  def format_date(date_time, timezone \\ "Asia/Kathmandu") do
+    date_time
+    |> Timex.to_datetime()
+    |> Timex.Timezone.convert(timezone)
+    |> Timex.format!("%b %e, %Y at %I:%M:%S %p", :strftime)
   end
 end

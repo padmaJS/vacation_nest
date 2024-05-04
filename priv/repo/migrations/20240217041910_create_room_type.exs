@@ -5,7 +5,7 @@ defmodule VacationNest.Repo.Migrations.CreateRoomType do
     create table(:room_types, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :type, :string
-      add :price, :float
+      add :price, :integer
 
       timestamps()
     end

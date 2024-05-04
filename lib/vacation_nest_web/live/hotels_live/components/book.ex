@@ -1,6 +1,5 @@
 defmodule VacationNestWeb.HotelsLive.Book do
   use VacationNestWeb, :live_component
-  import VacationNest.DisplayHelper
 
   alias VacationNest.Rooms
 
@@ -25,35 +24,25 @@ defmodule VacationNestWeb.HotelsLive.Book do
             type="number"
             field={@form[:room_count]}
             value={@form[:room_count].value}
-            max={@rooms |> Map.get(@form[:room_type].value, 0)}
-            min={if @rooms |> Map.get(@form[:room_type].value, 0) > 0, do: 1, else: 0}
+            max={get_value(@rooms, @form[:room_type].value)}
+            min={if get_value(@rooms, @form[:room_type].value) > 0, do: 1, else: 0}
             step="1"
           />
           <div class="mb-4">
             <label for="total_price" class="block text-sm font-medium text-gray-900">
               Total Price
             </label>
-            <.input
-              type="hidden"
-              field={@form[:total_price]}
-              value={
-                @form[:room_type].value &&
-                  get_price_for_room(
-                    @form[:room_count].value,
-                    @form[:room_type].value,
-                    @number_of_days
-                  )
-              }
-            />
             <span id="total_price" class="block mt-1 font-semibold text-green-600">
               <%= if val = @form[:room_type].value,
                 do:
-                  get_price_for_room(
-                    @form[:room_count].value,
-                    val,
-                    @number_of_days
+                  Money.to_string(
+                    get_price_for_room(
+                      @form[:room_count].value,
+                      val,
+                      @number_of_days
+                    )
                   ),
-                else: 0 %>
+                else: Money.to_string(Money.new(0)) %>
             </span>
           </div>
         </div>
@@ -91,15 +80,19 @@ defmodule VacationNestWeb.HotelsLive.Book do
         "check_in_day" => check_in_day,
         "check_out_day" => check_out_day
       })
+      |> Enum.map(fn {room_type, count} ->
+        {room_type, count, Rooms.get_price_for_room_type(room_type)}
+      end)
+      |> Enum.sort_by(fn {_room_type, _count, price} -> price.amount end)
 
-    room_types = rooms |> Map.keys()
+    room_types = rooms |> Enum.map(fn {room_type, _count, _price} -> room_type end)
 
     {:ok,
      assign(socket, assigns)
      |> assign(:rooms, rooms)
      |> assign(:room_types, room_types)
      |> assign(:number_of_days, number_of_days)
-     |> assign_form(%{"total_price" => 0, "room_count" => 0})}
+     |> assign_form(%{"room_count" => 0})}
   end
 
   @impl true
@@ -107,7 +100,11 @@ defmodule VacationNestWeb.HotelsLive.Book do
     {:noreply, socket |> assign_form(params)}
   end
 
-  def handle_event("book_room", params, socket) do
+  def handle_event(
+        "book_room",
+        %{"room_count" => room_count, "room_type" => room_type} = params,
+        socket
+      ) do
     if Rooms.list_on_going_bookings_between_dates(
          socket.assigns.current_user,
          socket.assigns.check_in_day,
@@ -117,6 +114,14 @@ defmodule VacationNestWeb.HotelsLive.Book do
         Map.put(params, "check_in_day", socket.assigns.check_in_day)
         |> Map.put("check_out_day", socket.assigns.check_out_day)
         |> Map.put("user_id", socket.assigns.current_user.id)
+        |> Map.put(
+          "total_price",
+          get_price_for_room(
+            room_count,
+            room_type |> String.to_atom(),
+            socket.assigns.number_of_days
+          )
+        )
 
       Rooms.create_booking_for_room(params)
 
@@ -132,24 +137,37 @@ defmodule VacationNestWeb.HotelsLive.Book do
     end
   end
 
-  defp assign_form(socket, changeset \\ %{}) do
+  defp assign_form(socket, changeset) do
     assign(socket, :form, to_form(changeset))
   end
 
   defp get_price_for_room(room_count, room_type, number_of_days) do
     cond do
       room_count == "" ->
-        0.0
+        Money.new(0)
 
       is_binary(room_count) ->
         {room_count, _} = Integer.parse(room_count)
-        room_count * Rooms.get_price_for_room_type(room_type) * number_of_days
+        Money.multiply(Rooms.get_price_for_room_type(room_type), room_count * number_of_days)
 
       is_integer(room_count) ->
-        room_count * Rooms.get_price_for_room_type(room_type) * number_of_days
+        Money.multiply(Rooms.get_price_for_room_type(room_type), room_count * number_of_days)
 
       true ->
-        0.0
+        Money.new(0)
+    end
+  end
+
+  defp get_value(list, key) do
+    if key do
+      [{_, room_count, _}] =
+        Enum.filter(list, fn {room_type, _room_count, _price} ->
+          room_type == key
+        end)
+
+      room_count
+    else
+      0
     end
   end
 end

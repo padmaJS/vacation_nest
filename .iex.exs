@@ -1,5 +1,3 @@
-alias VacationNest.Repo
-alias VacationNest.Hotels
-alias VacationNest.Hotels.Hotel
-alias VacationNest.Accounts
+alias VacationNest.{Accounts, Rooms, Hotels, Repo}
 alias VacationNest.Accounts.User
+alias VacationNest.Hotels.{Room, RoomType, Review}

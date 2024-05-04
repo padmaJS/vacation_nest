@@ -21,7 +21,7 @@ defmodule VacationNest.Rooms do
         )
 
       query
-      |> select([r, b], r)
+      |> distinct([r, b], r)
       |> Repo.all()
       |> Repo.preload(:room_type)
     else
@@ -70,11 +70,10 @@ defmodule VacationNest.Rooms do
   end
 
   def create_booking_for_room(params) do
-    total_price = params["total_price"] |> String.to_float()
     room_count = params["room_count"] |> String.to_integer()
 
     case create_booking(%{
-           total_amount: total_price,
+           total_amount: params["total_price"],
            check_in_day: params["check_in_day"],
            check_out_day: params["check_out_day"],
            user_id: params["user_id"]
@@ -96,9 +95,6 @@ defmodule VacationNest.Rooms do
     %Booking{} |> Booking.changeset(attrs) |> Repo.insert()
   end
 
-  def list_available_rooms() do
-  end
-
   def create_bookings_rooms(attrs) do
     %BookingsRooms{}
     |> BookingsRooms.changeset(attrs)
@@ -107,10 +103,12 @@ defmodule VacationNest.Rooms do
 
   def list_bookings(user_id) do
     Repo.all(from b in Booking, where: b.user_id == ^user_id, order_by: [desc: b.updated_at])
+    |> Repo.preload(rooms: [:room_type])
   end
 
   def list_bookings() do
-    Repo.all(from b in Booking, order_by: [desc: b.updated_at]) |> Repo.preload([:user])
+    Repo.all(from b in Booking, order_by: [desc: b.updated_at])
+    |> Repo.preload([:user, rooms: [:room_type]])
   end
 
   def update_booking(booking, attrs) do
