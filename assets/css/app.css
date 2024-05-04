@@ -3,3 +3,10 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+@font-face {
+  font-family: 'Gidole';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Gidole.ttf') format('truetype'), url('/fonts/Gidolinya.otf') format('opentype');
+}
