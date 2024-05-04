@@ -31,7 +31,47 @@ defmodule VacationNestWeb.UserRegistrationLive do
           Oops, something went wrong! Please check the errors below.
         </.error>
 
+        <div>
+          <.live_file_input
+            upload={@uploads.profile_image}
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+          />
+          <%= for entry <- @uploads.profile_image.entries do %>
+            <article class="upload-entry">
+              <figure class="flex items-center">
+                <.live_img_preview entry={entry} width="150" />
+                <figcaption><%= entry.client_name %></figcaption>&nbsp;
+                <button
+                  type="button"
+                  phx-click="cancel-upload"
+                  phx-value-ref={entry.ref}
+                  aria-label="cancel"
+                >
+                  &times;
+                </button>
+              </figure>
+            </article>
+            <.error :for={err <- upload_errors(@uploads.profile_image, entry)} class="!mt-0">
+              <%= error_to_string(err) %>
+            </.error>
+          <% end %>
+          <.error :for={err <- upload_errors(@uploads.profile_image)}>
+            <%= error_to_string(err) %>
+          </.error>
+        </div>
+
         <.input field={@form[:email]} type="email" label="Email" required />
+        <.input field={@form[:name]} type="text" label="Name" required />
+
+        <.input
+          field={@form[:gender]}
+          label="Gender"
+          type="select"
+          options={["male", "female"]}
+          prompt="Select your gender"
+          required
+        />
+
         <.input field={@form[:phone_number]} type="text" label="Phone Number" required />
         <.input field={@form[:password]} type="password" label="Password" required />
         <.input
@@ -61,11 +101,31 @@ defmodule VacationNestWeb.UserRegistrationLive do
       socket
       |> assign(trigger_submit: false, check_errors: false)
       |> assign_form(changeset)
+      |> assign(:uploaded_files, [])
+      |> allow_upload(:profile_image,
+        accept: ~w(.jpg .jpeg .png),
+        max_entries: 1
+      )
 
     {:ok, socket, temporary_assigns: [form: nil]}
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
+    uploaded_files =
+      consume_uploaded_entries(socket, :profile_image, fn %{path: path}, _entry ->
+        dest =
+          Path.join([:code.priv_dir(:vacation_nest), "static", "uploads", Path.basename(path)])
+
+        File.mkdir_p!(Path.dirname(dest))
+        File.cp!(path, dest)
+        {:ok, "/uploads/" <> Path.basename(dest)}
+      end)
+
+    user_params =
+      if uploaded_files != [],
+        do: Map.put(user_params, "profile_image", List.first(uploaded_files)),
+        else: user_params
+
     case Accounts.register_user(user_params) do
       {:ok, user} ->
         {:ok, _} =
@@ -96,4 +156,7 @@ defmodule VacationNestWeb.UserRegistrationLive do
       assign(socket, form: form)
     end
   end
+
+  def error_to_string(:too_large), do: "Too large"
+  def error_to_string(:too_many_files), do: "You have selected too many files"
 end

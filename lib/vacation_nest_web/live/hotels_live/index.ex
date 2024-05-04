@@ -76,7 +76,8 @@ defmodule VacationNestWeb.HotelsLive.Index do
      |> assign(:rooms, rooms)
      |> assign(:rooms_available?, rooms_available?)
      |> assign(:check_in_day, check_in_day)
-     |> assign(:check_out_day, check_out_day)}
+     |> assign(:check_out_day, check_out_day)
+     |> assign(:current_page, :book)}
   end
 
   @impl true

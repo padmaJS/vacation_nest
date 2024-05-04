@@ -19,8 +19,6 @@ defmodule VacationNestWeb.UserSettingsLive do
         />
 
         <.simple_form for={@user_form} phx-submit="update_profile" phx-change="validate_user">
-          <.input field={@user_form[:email]} type="email" label="Email" required />
-
           <.input field={@user_form[:name]} type="text" label="Name" required />
 
           <.input field={@user_form[:phone_number]} type="text" label="Phone Number" required />

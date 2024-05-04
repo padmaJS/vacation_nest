@@ -32,6 +32,7 @@ defmodule VacationNest.Hotels do
     Review
     |> order_by(desc: :updated_at)
     |> Repo.all()
+    |> Repo.preload(:user)
   end
 
   def get_rating() do

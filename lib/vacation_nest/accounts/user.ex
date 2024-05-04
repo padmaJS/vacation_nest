@@ -46,6 +46,7 @@ defmodule VacationNest.Accounts.User do
     |> cast(attrs, [:email, :name, :profile_image, :phone_number, :gender])
     |> validate_required([:email, :name, :phone_number, :gender])
     |> maybe_validate_phone_number(attrs)
+    |> validate_email(attrs)
   end
 
   defp maybe_validate_phone_number(changeset, _attrs) do
@@ -56,7 +57,8 @@ defmodule VacationNest.Accounts.User do
 
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :name, :profile_image, :password, :phone_number])
+    |> cast(attrs, [:email, :name, :profile_image, :password, :phone_number, :gender])
+    |> validate_required([:email, :name, :password, :phone_number, :gender])
     |> validate_email(opts)
     |> validate_password(opts)
     |> validate_phone_number
@@ -102,14 +104,10 @@ defmodule VacationNest.Accounts.User do
     end
   end
 
-  defp maybe_validate_unique_email(changeset, opts) do
-    if Keyword.get(opts, :validate_email, true) do
-      changeset
-      |> unsafe_validate_unique(:email, VacationNest.Repo)
-      |> unique_constraint(:email)
-    else
-      changeset
-    end
+  defp maybe_validate_unique_email(changeset, _opts) do
+    changeset
+    |> unsafe_validate_unique(:email, VacationNest.Repo)
+    |> unique_constraint(:email)
   end
 
   @doc """
