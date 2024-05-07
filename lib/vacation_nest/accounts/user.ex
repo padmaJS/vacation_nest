@@ -2,6 +2,11 @@ defmodule VacationNest.Accounts.User do
   use VacationNest.Schema
   import Ecto.Changeset
 
+  @derive {
+    Flop.Schema,
+    filterable: [:name, :inserted_at, :role], sortable: [:name, :inserted_at, :role]
+  }
+
   schema "users" do
     field :email, :string
     field :name, :string
@@ -14,6 +19,7 @@ defmodule VacationNest.Accounts.User do
     field :confirmed_at, :naive_datetime
 
     has_many :reviews, VacationNest.Hotels.Review
+    has_many :bookings, VacationNest.Hotels.Booking
 
     timestamps()
   end
@@ -43,10 +49,16 @@ defmodule VacationNest.Accounts.User do
   """
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :name, :profile_image, :phone_number, :gender])
+    |> cast(attrs, [:email, :name, :profile_image, :phone_number, :gender, :role])
     |> validate_required([:email, :name, :phone_number, :gender])
     |> maybe_validate_phone_number(attrs)
     |> validate_email(attrs)
+  end
+
+  def edit_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :role, :name, :phone_number, :gender])
+    |> validate_email(opts)
   end
 
   defp maybe_validate_phone_number(changeset, _attrs) do

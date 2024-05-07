@@ -22,15 +22,20 @@ now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 }
 |> Repo.insert!()
 
-%VacationNest.Accounts.User{
-  email: "guest1@gmail.com",
-  role: :guest,
-  hashed_password: Bcrypt.hash_pwd_salt("guest"),
-  phone_number: "1",
-  confirmed_at: now,
-  profile_image: "https://picsum.photos/200"
-}
-|> Repo.insert!()
+1..30
+|> Enum.each(fn i ->
+  %VacationNest.Accounts.User{
+    email: "guest#{i}@gmail.com",
+    name: "Guest #{i}",
+    gender: Enum.random(["male", "female"]),
+    role: :guest,
+    hashed_password: Bcrypt.hash_pwd_salt("guest"),
+    phone_number: "1",
+    confirmed_at: now,
+    profile_image: "https://picsum.photos/200"
+  }
+  |> Repo.insert!()
+end)
 
 single =
   %VacationNest.Hotels.RoomType{

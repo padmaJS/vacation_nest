@@ -1,7 +1,5 @@
 <.flash_group flash={@flash} />
-<%= if assigns[:current_page] in [:home, :bookings, :book, :about, :profile] do %>
-  <.navigation_bar current_user={assigns[:current_user]} current_page={assigns[:current_page]} />
-<% end %>
+<.navigation_bar current_user={assigns[:current_user]} current_page={assigns[:current_page]} />
 <main>
   <div class="mx-auto ">
     <%= @inner_content %>

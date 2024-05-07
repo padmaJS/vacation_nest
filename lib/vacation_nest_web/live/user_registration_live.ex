@@ -34,7 +34,7 @@ defmodule VacationNestWeb.UserRegistrationLive do
         <div>
           <.live_file_input
             upload={@uploads.profile_image}
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#325D79] focus:border-[#325D79] block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#325D79] dark:focus:border-[#325D79]"
           />
           <%= for entry <- @uploads.profile_image.entries do %>
             <article class="upload-entry">
@@ -51,7 +51,7 @@ defmodule VacationNestWeb.UserRegistrationLive do
                 </button>
               </figure>
             </article>
-            <.error :for={err <- upload_errors(@uploads.profile_image, entry)} class="!mt-0">
+            <.error :for={err <- upload_errors(@uploads.profile_image, entry)}>
               <%= error_to_string(err) %>
             </.error>
           <% end %>
@@ -106,6 +106,7 @@ defmodule VacationNestWeb.UserRegistrationLive do
         accept: ~w(.jpg .jpeg .png),
         max_entries: 1
       )
+      |> assign(:current_page, :register)
 
     {:ok, socket, temporary_assigns: [form: nil]}
   end

@@ -58,7 +58,7 @@ defmodule VacationNest.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id), do: Repo.get!(User, id) |> Repo.preload(bookings: [rooms: :room_type])
 
   ## User registration
 
@@ -360,5 +360,26 @@ defmodule VacationNest.Accounts do
     user
     |> User.changeset(attrs)
     |> Repo.update()
+  end
+
+  def delete_user(user) do
+    Repo.delete(user)
+  end
+
+  def list_users(params \\ %{"order_by" => ["inserted_at"]}) do
+    params = params |> Map.put("page_size", 9)
+
+    case Flop.validate_and_run(User, params, for: User) do
+      {:ok, {users, meta}} ->
+        %{users: users, meta: meta}
+
+      {:error, meta} ->
+        %{users: [], meta: meta}
+    end
+  end
+
+  def edit_changeset(user, attrs \\ %{}) do
+    user
+    |> User.edit_changeset(attrs)
   end
 end

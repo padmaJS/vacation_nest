@@ -14,4 +14,14 @@ defmodule VacationNest.DisplayHelper do
     |> Timex.Timezone.convert(timezone)
     |> Timex.format!("%b %e, %Y at %I:%M:%S %p", :strftime)
   end
+
+  def humanize_text(text) when is_atom(text), do: humanize_text(Atom.to_string(text))
+
+  def humanize_text(text) when is_binary(text) do
+    String.split(text, " ")
+    |> Enum.map(&String.capitalize/1)
+    |> Enum.join(" ")
+  end
+
+  def humanize_text(_), do: ""
 end

@@ -105,35 +105,52 @@ defmodule VacationNestWeb.HotelsLive.Book do
         %{"room_count" => room_count, "room_type" => room_type} = params,
         socket
       ) do
-    if Rooms.list_on_going_bookings_between_dates(
-         socket.assigns.current_user,
-         socket.assigns.check_in_day,
-         socket.assigns.check_out_day
-       ) == [] do
-      params =
-        Map.put(params, "check_in_day", socket.assigns.check_in_day)
-        |> Map.put("check_out_day", socket.assigns.check_out_day)
-        |> Map.put("user_id", socket.assigns.current_user.id)
-        |> Map.put(
-          "total_price",
-          get_price_for_room(
-            room_count,
-            room_type |> String.to_atom(),
-            socket.assigns.number_of_days
+    on_going_bookings =
+      Rooms.list_on_going_bookings_between_dates(
+        socket.assigns.current_user,
+        socket.assigns.check_in_day,
+        socket.assigns.check_out_day
+      )
+
+    cond do
+      on_going_bookings == [] &&
+          Rooms.get_available_room_count_for_room_type(
+            params
+            |> Map.put("check_in_day", socket.assigns.check_in_day)
+            |> Map.put("check_out_day", socket.assigns.check_out_day),
+            room_type |> String.to_atom()
+          ) >= String.to_integer(room_count) ->
+        params =
+          Map.put(params, "check_in_day", socket.assigns.check_in_day)
+          |> Map.put("check_out_day", socket.assigns.check_out_day)
+          |> Map.put("user_id", socket.assigns.current_user.id)
+          |> Map.put(
+            "total_price",
+            get_price_for_room(
+              room_count,
+              room_type |> String.to_atom(),
+              socket.assigns.number_of_days
+            )
           )
-        )
 
-      Rooms.create_booking_for_room(params)
+        Rooms.create_booking_for_room(params)
 
-      {:noreply,
-       socket
-       |> put_flash(:info, "Room book requested successfully.")
-       |> push_patch(to: socket.assigns.patch)}
-    else
-      {:noreply,
-       socket
-       |> put_flash(:error, "Check your booking requests first.")
-       |> push_patch(to: socket.assigns.patch)}
+        {:noreply,
+         socket
+         |> put_flash(:info, "Room book requested successfully.")
+         |> push_patch(to: socket.assigns.patch)}
+
+      on_going_bookings != [] ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Check your booking requests first.")
+         |> push_patch(to: socket.assigns.patch)}
+
+      true ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Something went wrong. Please try again.")
+         |> push_patch(to: socket.assigns.patch)}
     end
   end
 

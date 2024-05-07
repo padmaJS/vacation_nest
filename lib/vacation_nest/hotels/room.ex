@@ -4,6 +4,11 @@ defmodule VacationNest.Hotels.Room do
 
   import Ecto.Changeset
 
+  @derive {
+    Flop.Schema,
+    filterable: [:room_number, :status], sortable: [:room_number, :status]
+  }
+
   schema "rooms" do
     field :room_number, :integer
     field :status, Ecto.Enum, values: [:available, :unavailable], default: :available
@@ -16,10 +21,11 @@ defmodule VacationNest.Hotels.Room do
     timestamps()
   end
 
-  @attrs [:price, :room_number, :status]
+  @attrs [:room_number, :status, :room_type_id]
 
   def changeset(room, attrs) do
     room
     |> cast(attrs, @attrs)
+    |> unique_constraint(:room_number)
   end
 end

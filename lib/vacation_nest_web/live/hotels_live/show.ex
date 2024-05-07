@@ -8,6 +8,39 @@ defmodule VacationNestWeb.HotelsLive.Show do
   @impl true
   def render(assigns) do
     ~H"""
+    <div class="min-h-screen min-w-screen bg-[url('/images/hotel_scenary1.jpg')] bg-cover grid grid-cols-4 grid-rows-3 justify-items-center">
+      <!-- Appraisal and Basic Info -->
+      <div class="col-span-2 row-start-2 col-start-1">
+        <h1 class="text-7xl font-semibold">Vacation Nest</h1>
+      </div>
+      <div class="row-start-2 col-start-3 text-2xl font-semibold">
+        <p class="text-gray-600">A cozy retreat in the heart of the city.</p>
+        <p>Check-in: 2:00 PM</p>
+        <p>Check-out: 11:00 AM</p>
+        <p>Nasamana 13, Bhaktapur, Nepal</p>
+      </div>
+    </div>
+
+    <div class="min-h-screen flex flex-col">
+      <!-- Amenities -->
+      <div class="bg-white p-4 mt-4">
+        <h2 class="text-lg font-semibold">Our Services:</h2>
+        <ul class="list-disc pl-4">
+          <li>Free Wi-Fi</li>
+          <li>Outdoor pool</li>
+          <li>Fitness center</li>
+          <!-- Add more amenities here -->
+        </ul>
+      </div>
+    </div>
+    <div class="min-h-screen flex flex-col">
+      <!-- Contact Info -->
+      <div class="bg-gray-100 p-4 mt-4">
+        <h2 class="text-lg font-semibold">Contact Us</h2>
+        <p>Phone: +1 123-456-7890</p>
+        <p>Email: info@hotelxyz.com</p>
+      </div>
+    </div>
     <!-- lib/my_app_web/live/about_live.ex -->
     <div class="bg-gray-100 min-h-screen flex items-center justify-center">
       <div class="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
@@ -162,7 +195,9 @@ defmodule VacationNestWeb.HotelsLive.Show do
       socket.assigns.current_user && Hotels.get_review_by_user(socket.assigns.current_user.id)
 
     reviews =
-      Hotels.list_reviews() |> Enum.filter(&(&1.user_id != socket.assigns.current_user.id))
+      if socket.assigns.current_user,
+        do: Hotels.list_reviews() |> Enum.filter(&(&1.user_id != socket.assigns.current_user.id)),
+        else: Hotels.list_reviews()
 
     rating = Hotels.get_rating()
 
@@ -200,6 +235,10 @@ defmodule VacationNestWeb.HotelsLive.Show do
 
   @impl true
   def handle_info({VacationNestWeb.HotelsLive.Review, {:saved, review}}, socket) do
-    {:noreply, socket |> assign(:user_review, review) |> assign(:rating, Hotels.get_rating())}
+    {:noreply,
+     socket
+     |> assign(:user_review, review)
+     |> assign(:rating, Hotels.get_rating())
+     |> assign(:ratings_count, Hotels.get_rating_count())}
   end
 end

@@ -3,26 +3,51 @@ defmodule VacationNest.Rooms do
   alias VacationNest.Repo
   alias VacationNest.Hotels.{Room, RoomType, Booking, BookingsRooms}
 
-  @check_in_time ~T[23:59:00.00]
+  @check_in_time ~T[14:00:00.00]
   # @check_out_time ~T[19:00:00]
 
   def get_available_rooms(%{"check_in_day" => check_in_day, "check_out_day" => check_out_day}) do
     now = Timex.now("Asia/Kathmandu") |> DateTime.to_time()
     today = Date.utc_today()
 
-    if Date.from_iso8601!(check_in_day) == today && Timex.compare(now, @check_in_time) == -1 do
-      query =
+    if (Date.from_iso8601!(check_in_day) == today && Timex.compare(now, @check_in_time) == -1) or
+         Date.from_iso8601!(check_in_day) > today do
+      available_rooms =
         Room
         |> join(:left, [r], b in assoc(r, :bookings))
         |> where(
           [r, b],
-          is_nil(b.id) or b.check_in_day > ^check_out_day or
-            b.check_out_day < ^check_in_day or b.status not in [:confirmed, :on_going]
+          is_nil(b.id) or b.check_in_day > ^check_out_day or b.check_out_day < ^check_in_day
         )
+        |> select([r, b], r)
+        |> Repo.all()
 
-      query
-      |> distinct([r, b], r)
-      |> Repo.all()
+      unavailable_rooms =
+        Room
+        |> join(:left, [r], b in assoc(r, :bookings))
+        |> where(
+          [r, b],
+          (b.check_in_day >= ^check_in_day or b.check_out_day <= ^check_out_day or
+             (b.check_in_day <= ^check_in_day and b.check_out_day >= ^check_out_day)) and
+            b.status in [:confirmed, :on_going]
+        )
+        |> distinct([r, b], r)
+        |> select([r, b], r.id)
+        |> Repo.all()
+
+      overlapping_rooms =
+        Room
+        |> join(:left, [r], b in assoc(r, :bookings))
+        |> where(
+          [r, b],
+          (b.check_in_day >= ^check_in_day or b.check_out_day <= ^check_out_day or
+             (b.check_in_day <= ^check_in_day and b.check_out_day >= ^check_out_day)) and
+            b.status not in [:confirmed, :on_going]
+        )
+        |> distinct([r, b], r)
+        |> Repo.all()
+
+      (available_rooms ++ Enum.filter(overlapping_rooms, &(&1.id not in unavailable_rooms)))
       |> Repo.preload(:room_type)
     else
       []
@@ -38,6 +63,28 @@ defmodule VacationNest.Rooms do
 
   def list_room_types do
     Repo.all(RoomType)
+  end
+
+  def get_available_room_count_for_room_type(params, type) do
+    case get_available_rooms(params) do
+      [] ->
+        0
+
+      rooms ->
+        rooms =
+          rooms
+          |> Enum.group_by(& &1.room_type.type)
+          |> Enum.filter(fn {key, _} -> key == type end)
+
+        {_, count} =
+          if rooms == [] do
+            {[], 0}
+          else
+            Enum.map(rooms, fn {type, rooms} -> {type, Enum.count(rooms)} end) |> Enum.at(0)
+          end
+
+        count
+    end
   end
 
   def list_room_types_with_room_count(params) do
@@ -62,6 +109,27 @@ defmodule VacationNest.Rooms do
         (available_room_types_with_room_count ++ unavailable_room_types_with_room_count)
         |> Enum.map(fn {key, value} -> {Atom.to_string(key), value} end)
         |> Enum.into(%{})
+    end
+  end
+
+  def check_room_availability_for_booking?(
+        %Booking{check_in_day: check_in_day, check_out_day: check_out_day} = booking
+      ) do
+    case get_available_rooms(%{
+           "check_in_day" => Date.to_string(check_in_day),
+           "check_out_day" => Date.to_string(check_out_day)
+         }) do
+      [] ->
+        false
+
+      available_rooms ->
+        available_rooms = available_rooms |> Enum.map(& &1.id)
+
+        rooms =
+          booking.rooms
+          |> Enum.map(& &1.id)
+
+        rooms == Enum.filter(rooms, &(&1 in available_rooms))
     end
   end
 
@@ -132,5 +200,47 @@ defmodule VacationNest.Rooms do
            (b.check_in_day >= ^check_in_day and b.check_out_day <= ^check_out_day))
     )
     |> Repo.all()
+  end
+
+  def get_room!(id) do
+    Repo.get!(Room, id)
+  end
+
+  def delete_room(%Room{} = room) do
+    Repo.delete(room)
+  end
+
+  def list_rooms(params \\ %{"order_by" => ["room_number"], "order_direction" => "asc"}) do
+    params =
+      params
+      |> Map.put("page_size", 9)
+
+    case Flop.validate_and_run(Room, params, for: Room) do
+      {:ok, {rooms, meta}} ->
+        %{rooms: rooms |> Repo.preload(:room_type), meta: meta}
+
+      {:error, meta} ->
+        %{rooms: [], meta: meta}
+    end
+  end
+
+  def change_room(%Room{} = room, attrs \\ %{}) do
+    Room.changeset(room, attrs)
+  end
+
+  def create_room(attrs) do
+    case %Room{} |> Room.changeset(attrs) |> Repo.insert() do
+      {:ok, room} ->
+        {:ok, Repo.preload(room, :room_type)}
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
+  end
+
+  def update_room(%Room{} = room, attrs) do
+    room
+    |> Room.changeset(attrs)
+    |> Repo.update()
   end
 end
