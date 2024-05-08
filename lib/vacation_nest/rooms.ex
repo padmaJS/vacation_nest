@@ -203,14 +203,14 @@ defmodule VacationNest.Rooms do
   end
 
   def get_room!(id) do
-    Repo.get!(Room, id)
+    Repo.get!(Room, id) |> Repo.preload([:room_type, :bookings])
   end
 
   def delete_room(%Room{} = room) do
     Repo.delete(room)
   end
 
-  def list_rooms(params \\ %{"order_by" => ["room_number"], "order_direction" => "asc"}) do
+  def list_rooms(params) do
     params =
       params
       |> Map.put("page_size", 9)

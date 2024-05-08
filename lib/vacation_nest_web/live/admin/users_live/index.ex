@@ -38,7 +38,7 @@ defmodule VacationNestWeb.Admin.UsersLive.Index do
               Edit
             </.link>
             <.link
-              class="text-white bg-[#325D79] hover:bg-[#527D99] focus:ring-4 focus:ring-[#325D79] font-medium rounded-lg px-5 py-1.5 focus:outline-none transition duration-300"
+              class="text-white bg-[#325D99] hover:bg-[#527DAA] focus:ring-4 focus:ring-[#325D79] font-medium rounded-lg px-5 py-1.5 focus:outline-none transition duration-300"
               patch={~p"/users/profile/#{user.id}"}
             >
               Show

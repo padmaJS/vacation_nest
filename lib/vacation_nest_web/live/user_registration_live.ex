@@ -6,7 +6,7 @@ defmodule VacationNestWeb.UserRegistrationLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
+    <div class=" w-[40%] mx-auto bg-gray-50 p-14 pb-8 my-5 shadow-2xl rounded-lg">
       <.header class="text-center">
         Register for an account
         <:subtitle>
@@ -32,9 +32,10 @@ defmodule VacationNestWeb.UserRegistrationLive do
         </.error>
 
         <div>
+          <.label for="profile_image">Profile Image</.label>
           <.live_file_input
             upload={@uploads.profile_image}
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#325D79] focus:border-[#325D79] block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#325D79] dark:focus:border-[#325D79]"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#325D79] focus:border-[#325D79] block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#325D79] dark:focus:border-[#325D79] mt-2"
           />
           <%= for entry <- @uploads.profile_image.entries do %>
             <article class="upload-entry">

@@ -3,7 +3,7 @@ defmodule VacationNestWeb.UserLoginLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
+    <div class=" w-1/3 mx-auto bg-gray-50 p-14 pb-8 my-5 shadow-2xl rounded-lg">
       <.header class="text-center">
         Sign in to account
         <:subtitle>

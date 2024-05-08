@@ -9,17 +9,17 @@ defmodule VacationNestWeb.HotelsLive.Book do
     <div>
       <.header>Book the room</.header>
 
-      <.form for={@form} phx-target={@myself} phx-submit="book_room" phx-change="validate">
+      <.simple_form for={@form} phx-target={@myself} phx-submit="book_room" phx-change="validate">
         <div class="mb-4">
-          <label for="room_type" class="block text-sm font-medium text-gray-900">
-            Select a room category
-          </label>
-          <.input
-            type="select"
-            field={@form[:room_type]}
-            options={@room_types}
-            prompt="Select Room Type"
-          />
+          <div class="mb-4">
+            <.input
+              type="select"
+              field={@form[:room_type]}
+              options={@room_types}
+              prompt="Select Room Type"
+              label="Room type"
+            />
+          </div>
           <.input
             type="number"
             field={@form[:room_count]}
@@ -27,12 +27,13 @@ defmodule VacationNestWeb.HotelsLive.Book do
             max={get_value(@rooms, @form[:room_type].value)}
             min={if get_value(@rooms, @form[:room_type].value) > 0, do: 1, else: 0}
             step="1"
+            label="Room count"
           />
-          <div class="mb-4">
-            <label for="total_price" class="block text-sm font-medium text-gray-900">
-              Total Price
+          <div class="my-4 flex space-x-3">
+            <label for="total_price" class="block text-xl font-semibold text-gray-900">
+              Total Price:
             </label>
-            <span id="total_price" class="block mt-1 font-semibold text-green-600">
+            <span id="total_price" class="block text-xl font-semibold text-green-600">
               <%= if val = @form[:room_type].value,
                 do:
                   Money.to_string(
@@ -46,19 +47,21 @@ defmodule VacationNestWeb.HotelsLive.Book do
             </span>
           </div>
         </div>
-        <.button
-          class="text-white inline-flex items-center bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:focus:ring-emerald-800"
-          phx-disable-with="Booking..."
-        >
-          Book now
-        </.button>
-        <.link
-          patch={@patch}
-          class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-        >
-          Cancel
-        </.link>
-      </.form>
+        <:actions>
+          <.button
+            class="text-white inline-flex items-center bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:focus:ring-emerald-800"
+            phx-disable-with="Booking..."
+          >
+            Book now
+          </.button>
+          <.link
+            patch={@patch}
+            class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+          >
+            Cancel
+          </.link>
+        </:actions>
+      </.simple_form>
     </div>
     """
   end

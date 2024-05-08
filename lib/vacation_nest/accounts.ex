@@ -366,7 +366,7 @@ defmodule VacationNest.Accounts do
     Repo.delete(user)
   end
 
-  def list_users(params \\ %{"order_by" => ["inserted_at"]}) do
+  def list_users(params \\ %{"order_by" => ["inserted_at"], "order_directions" => ["asc"]}) do
     params = params |> Map.put("page_size", 9)
 
     case Flop.validate_and_run(User, params, for: User) do

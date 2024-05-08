@@ -11,7 +11,7 @@ defmodule VacationNestWeb.UserProfileLive.Show do
         <.link
           :if={@current_user && @current_user.id == @user.id}
           patch={~p"/users/settings"}
-          class="absolute font-medium top-0 right-0 p-[8px] rounded-lg bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300"
+          class="absolute font-medium top-0 right-0 p-[8px] rounded-lg bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 z-10"
         >
           Edit Profile
         </.link>

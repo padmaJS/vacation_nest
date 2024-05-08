@@ -1,7 +1,9 @@
 <.flash_group flash={@flash} />
-<.navigation_bar current_user={assigns[:current_user]} current_page={assigns[:current_page]} />
+<div class="fixed w-full top-0 right-0 z-40">
+  <.navigation_bar current_user={assigns[:current_user]} current_page={assigns[:current_page]} />
+</div>
 <main>
-  <div class="mx-auto ">
+  <div class="mx-auto pt-[78px] ">
     <%= @inner_content %>
   </div>
 </main>

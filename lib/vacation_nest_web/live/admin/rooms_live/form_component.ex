@@ -25,6 +25,12 @@ defmodule VacationNestWeb.Admin.RoomsLive.FormComponent do
           label="Room Type"
           options={Rooms.list_room_types() |> Enum.map(&{&1.type, &1.id})}
         />
+        <.input
+          field={@form[:status]}
+          type="select"
+          label="Status"
+          options={[:available, :unavailable]}
+        />
         <:actions>
           <.button
             class="text-white bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg px-5 py-1.5 transition duration-300"

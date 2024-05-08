@@ -6,33 +6,25 @@ defmodule VacationNestWeb.HotelsLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <%= if @rooms_available? do %>
-      <table class="table-auto w-full text-left text-gray-600">
-        <thead>
-          <tr class="border-b border-gray-200">
-            <th class="py-4 px-6 text-xs font-medium uppercase tracking-wider">Room Type</th>
-            <th class="py-4 px-6 text-xs font-medium uppercase tracking-wider">Available Rooms</th>
-            <th class="py-4 px-6 text-xs font-medium uppercase tracking-wider">Price per Room</th>
-          </tr>
-        </thead>
-        <tbody>
-          <%= for {room_type, count, price} <- @rooms do %>
-            <tr class="border-b border-gray-200 hover:bg-gray-100">
-              <td class="py-4 px-6"><%= room_type %></td>
-              <td class="py-4 px-6"><%= count %></td>
-              <td class="py-4 px-6">
-                <%= price %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-      <.link navigate={~p"/hotel/book?check_in_day=#{@check_in_day}&check_out_day=#{@check_out_day}"}>
-        Book room?
-      </.link>
-    <% else %>
-      Oops. Seems we have no room available for now.
-    <% end %>
+    <div class="grid mx-auto w-1/2 !gap-y-10 bg-gray-50 p-8 my-5 shadow-2xl rounded-lg">
+      <%= if @rooms_available? do %>
+        <.table id="rooms" rows={@rooms}>
+          <:col :let={{room_type, _count, _price}} label="Room Type"><%= room_type %></:col>
+          <:col :let={{_room_type, count, _price}} label="Room Count"><%= count %></:col>
+          <:col :let={{_room_type, _count, price}} label="Room Price"><%= price %></:col>
+        </.table>
+        <div class="mx-auto">
+          <.link
+            navigate={~p"/hotel/book?check_in_day=#{@check_in_day}&check_out_day=#{@check_out_day}"}
+            class="text-white  text-xl bg-[#2EAFA0] hover:bg-[#2A9D8F]  transition duration-300 focus:ring-4 focus:ring-emerald-300 font-semibold rounded-lg px-7 py-3 focus:outline-none transition duration-300"
+          >
+            Book room?
+          </.link>
+        </div>
+      <% else %>
+        Oops. Seems we have no room available for now.
+      <% end %>
+    </div>
 
     <.modal
       :if={@live_action == :book}
