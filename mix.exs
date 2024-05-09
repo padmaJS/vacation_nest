@@ -37,7 +37,7 @@ defmodule VacationNest.MixProject do
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
-      {:phoenix_html, "~> 3.3"},
+      {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.20.5"},
       {:floki, ">= 0.30.0", only: :test},
@@ -53,7 +53,10 @@ defmodule VacationNest.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:waffle, "~> 1.1"},
       {:waffle_ecto, "~> 0.0.12"},
-      {:timex, "~> 3.7.11"}
+      {:timex, "~> 3.7.11"},
+      {:money, "~> 1.12"},
+      {:flop, "~> 0.25.0"},
+      {:flop_phoenix, "~> 0.22.9"}
     ]
   end
 

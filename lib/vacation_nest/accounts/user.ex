@@ -2,15 +2,24 @@ defmodule VacationNest.Accounts.User do
   use VacationNest.Schema
   import Ecto.Changeset
 
+  @derive {
+    Flop.Schema,
+    filterable: [:name, :inserted_at, :role], sortable: [:name, :inserted_at, :role]
+  }
+
   schema "users" do
     field :email, :string
+    field :name, :string
     field :phone_number, :string
-    field :role, Ecto.Enum, values: [:guest, :partner, :admin], default: :guest
+    field :profile_image, :string
+    field :gender, :string
+    field :role, Ecto.Enum, values: [:guest, :staff, :admin], default: :guest
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
-    has_one :hotel, VacationNest.Hotels.Hotel
+    has_many :reviews, VacationNest.Hotels.Review
+    has_many :bookings, VacationNest.Hotels.Booking
 
     timestamps()
   end
@@ -38,9 +47,30 @@ defmodule VacationNest.Accounts.User do
       submitting the form), this option can be set to `false`.
       Defaults to `true`.
   """
+  def changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :name, :profile_image, :phone_number, :gender, :role])
+    |> validate_required([:email, :name, :phone_number, :gender])
+    |> maybe_validate_phone_number(attrs)
+    |> validate_email(attrs)
+  end
+
+  def edit_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :role, :name, :phone_number, :gender])
+    |> validate_email(opts)
+  end
+
+  defp maybe_validate_phone_number(changeset, _attrs) do
+    changeset
+    |> validate_format(:phone_number, ~r/^98[0-9]{8}$/, message: "must be a valid phone number")
+    |> unique_constraint(:phone_number)
+  end
+
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password, :phone_number])
+    |> cast(attrs, [:email, :name, :profile_image, :password, :phone_number, :gender])
+    |> validate_required([:email, :name, :password, :phone_number, :gender])
     |> validate_email(opts)
     |> validate_password(opts)
     |> validate_phone_number
@@ -86,14 +116,10 @@ defmodule VacationNest.Accounts.User do
     end
   end
 
-  defp maybe_validate_unique_email(changeset, opts) do
-    if Keyword.get(opts, :validate_email, true) do
-      changeset
-      |> unsafe_validate_unique(:email, VacationNest.Repo)
-      |> unique_constraint(:email)
-    else
-      changeset
-    end
+  defp maybe_validate_unique_email(changeset, _opts) do
+    changeset
+    |> unsafe_validate_unique(:email, VacationNest.Repo)
+    |> unique_constraint(:email)
   end
 
   @doc """

@@ -4,16 +4,13 @@ defmodule VacationNest.Repo.Migrations.CreateRooms do
   def change do
     create table(:rooms, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :hotel_id, references(:hotels, type: :uuid)
       add :room_number, :integer
-      add :price, :float
       add :status, :string
-      add :images, {:array, :string}
+      add :room_type_id, references(:room_types, type: :uuid)
 
       timestamps()
     end
 
-    create index(:rooms, [:hotel_id])
-    create unique_index(:rooms, [:hotel_id, :room_number])
+    create unique_index(:rooms, [:room_number])
   end
 end

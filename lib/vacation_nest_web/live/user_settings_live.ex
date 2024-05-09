@@ -5,69 +5,140 @@ defmodule VacationNestWeb.UserSettingsLive do
 
   def render(assigns) do
     ~H"""
-    <.header class="text-center">
-      Account Settings
-      <:subtitle>Manage your account email address and password settings</:subtitle>
-    </.header>
+    <div class=" w-[600px] mx-auto bg-gray-50 p-14 pb-8 my-5 shadow-2xl rounded-lg">
+      <.header class="text-center">
+        Account Settings
+        <:subtitle>Manage your account details</:subtitle>
+      </.header>
 
-    <div class="space-y-12 divide-y">
-      <div>
-        <.simple_form
-          for={@email_form}
-          id="email_form"
-          phx-submit="update_email"
-          phx-change="validate_email"
-        >
-          <.input field={@email_form[:email]} type="email" label="Email" required />
-          <.input
-            field={@email_form[:current_password]}
-            name="current_password"
-            id="current_password_for_email"
-            type="password"
-            label="Current password"
-            value={@email_form_current_password}
-            required
+      <div class="space-y-12 divide-y pt-4">
+        <div>
+          <img
+            :if={@current_user.profile_image}
+            class="w-[200px] h-[200px] mb-3 rounded-full shadow-lg mx-auto"
+            src={@current_user.profile_image}
           />
-          <:actions>
-            <.button phx-disable-with="Changing...">Change Email</.button>
-          </:actions>
-        </.simple_form>
+
+          <.simple_form for={@user_form} phx-submit="update_profile" phx-change="validate_user">
+            <.input field={@user_form[:name]} type="text" label="Name" required />
+
+            <.input field={@user_form[:phone_number]} type="text" label="Phone Number" required />
+
+            <.live_file_input
+              upload={@uploads.profile_image}
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#325D79] focus:border-[#325D79] block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#325D79] dark:focus:border-[#325D79]"
+            />
+            <%= for entry <- @uploads.profile_image.entries do %>
+              <article class="upload-entry">
+                <figure class="flex items-center">
+                  <.live_img_preview entry={entry} width="150" />
+                  <figcaption><%= entry.client_name %></figcaption>&nbsp;
+                  <button
+                    type="button"
+                    phx-click="cancel-upload"
+                    phx-value-ref={entry.ref}
+                    aria-label="cancel"
+                  >
+                    &times;
+                  </button>
+                </figure>
+              </article>
+              <.error :for={err <- upload_errors(@uploads.profile_image, entry)}>
+                <%= error_to_string(err) %>
+              </.error>
+            <% end %>
+            <.error :for={err <- upload_errors(@uploads.profile_image)}>
+              <%= error_to_string(err) %>
+            </.error>
+
+            <.input
+              field={@user_form[:gender]}
+              label="Gender"
+              type="select"
+              options={["male", "female"]}
+              prompt="Select your gender"
+              required
+            />
+
+            <.button type="submit">Save Profile</.button>
+          </.simple_form>
+        </div>
       </div>
-      <div>
-        <.simple_form
-          for={@password_form}
-          id="password_form"
-          action={~p"/users/log_in?_action=password_updated"}
-          method="post"
-          phx-change="validate_password"
-          phx-submit="update_password"
-          phx-trigger-action={@trigger_submit}
-        >
-          <.input
-            field={@password_form[:email]}
-            type="hidden"
-            id="hidden_user_email"
-            value={@current_email}
-          />
-          <.input field={@password_form[:password]} type="password" label="New password" required />
-          <.input
-            field={@password_form[:password_confirmation]}
-            type="password"
-            label="Confirm new password"
-          />
-          <.input
-            field={@password_form[:current_password]}
-            name="current_password"
-            type="password"
-            label="Current password"
-            id="current_password_for_password"
-            value={@current_password}
-            required
-          />
-          <:actions>
-            <.button phx-disable-with="Changing...">Change Password</.button>
-          </:actions>
-        </.simple_form>
+    </div>
+    <div class=" w-[600px] mx-auto bg-gray-50 p-14 pb-8 my-5 shadow-2xl rounded-lg">
+      <.header class="text-center">
+        Email
+        <:subtitle>Change your email</:subtitle>
+      </.header>
+
+      <div class="space-y-12 divide-y pt-4">
+        <div>
+          <.simple_form
+            for={@email_form}
+            id="email_form"
+            phx-submit="update_email"
+            phx-change="validate_email"
+          >
+            <.input field={@email_form[:email]} type="email" label="Email" required />
+            <.input
+              field={@email_form[:current_password]}
+              name="current_password"
+              id="current_password_for_email"
+              type="password"
+              label="Current password"
+              value={@email_form_current_password}
+              required
+            />
+            <:actions>
+              <.button phx-disable-with="Changing...">Change Email</.button>
+            </:actions>
+          </.simple_form>
+        </div>
+      </div>
+    </div>
+    <div class=" w-[600px] mx-auto bg-gray-50 p-14 pb-8 my-5 shadow-2xl rounded-lg">
+      <.header class="text-center">
+        Password
+        <:subtitle>Change your password</:subtitle>
+      </.header>
+
+      <div class="space-y-12 divide-y pt-4">
+        <div>
+          <.simple_form
+            for={@password_form}
+            id="password_form"
+            action={~p"/users/log_in?_action=password_updated"}
+            method="post"
+            phx-change="validate_password"
+            phx-submit="update_password"
+            phx-trigger-action={@trigger_submit}
+          >
+            <.input
+              field={@password_form[:email]}
+              type="hidden"
+              id="hidden_user_email"
+              value={@current_email}
+            />
+            <.input field={@password_form[:password]} type="password" label="New password" required />
+            <.input
+              field={@password_form[:password_confirmation]}
+              type="password"
+              label="Confirm new password"
+            />
+            <.input
+              field={@password_form[:current_password]}
+              name="current_password"
+              type="password"
+              label="Current password"
+              id="current_password_for_password"
+              value={@current_password}
+              required
+            />
+            <:actions>
+              <.button phx-disable-with="Changing...">Change Password</.button>
+            </:actions>
+          </.simple_form>
+        </div>
       </div>
     </div>
     """
@@ -90,6 +161,7 @@ defmodule VacationNestWeb.UserSettingsLive do
     user = socket.assigns.current_user
     email_changeset = Accounts.change_user_email(user)
     password_changeset = Accounts.change_user_password(user)
+    user_changeset = Accounts.change_user(user, %{})
 
     socket =
       socket
@@ -98,9 +170,57 @@ defmodule VacationNestWeb.UserSettingsLive do
       |> assign(:current_email, user.email)
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
+      |> assign(:user_form, to_form(user_changeset))
       |> assign(:trigger_submit, false)
+      |> assign(:current_page, :profile)
+      |> assign(:uploaded_files, [])
+      |> allow_upload(:profile_image,
+        accept: ~w(.jpg .jpeg .png),
+        max_entries: 1
+      )
 
     {:ok, socket}
+  end
+
+  def handle_event("validate_user", %{"user" => params}, socket) do
+    user_form =
+      socket.assigns.current_user
+      |> Accounts.change_user(params)
+      |> Map.put(:action, :validate)
+      |> to_form()
+
+    {:noreply, assign(socket, user_form: user_form)}
+  end
+
+  def handle_event("update_profile", %{"user" => user_params}, socket) do
+    user = socket.assigns.current_user
+
+    uploaded_files =
+      consume_uploaded_entries(socket, :profile_image, fn %{path: path}, _entry ->
+        dest =
+          Path.join([:code.priv_dir(:vacation_nest), "static", "uploads", Path.basename(path)])
+
+        File.mkdir_p!(Path.dirname(dest))
+        File.cp!(path, dest)
+        {:ok, "/uploads/" <> Path.basename(dest)}
+      end)
+
+    user_params =
+      if uploaded_files != [],
+        do: Map.put(user_params, "profile_image", List.first(uploaded_files)),
+        else: user_params
+
+    case Accounts.update_user(user, user_params) do
+      {:ok, _user} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Profile updated successfully")}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply,
+         assign(socket, user_form: to_form(changeset))
+         |> put_flash(:error, "Error updating profile")}
+    end
   end
 
   def handle_event("validate_email", params, socket) do
@@ -164,4 +284,7 @@ defmodule VacationNestWeb.UserSettingsLive do
         {:noreply, assign(socket, password_form: to_form(changeset))}
     end
   end
+
+  def error_to_string(:too_large), do: "Too large"
+  def error_to_string(:too_many_files), do: "You have selected too many files"
 end

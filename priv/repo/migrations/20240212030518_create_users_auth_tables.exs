@@ -8,13 +8,16 @@ defmodule VacationNest.Repo.Migrations.CreateUsersAuthTables do
       add :id, :binary_id, primary_key: true
       add :email, :citext, null: false
       add :phone_number, :string, null: false
+      add :profile_image, :string
+      add :name, :string
+      add :gender, :string
       add :hashed_password, :string, null: false
       add :role, :string
       add :confirmed_at, :naive_datetime
       timestamps()
     end
 
-    create unique_index(:users, [:email])
+    create unique_index(:users, [:email, :phone_number])
 
     create table(:users_tokens, primary_key: false) do
       add :id, :binary_id, primary_key: true

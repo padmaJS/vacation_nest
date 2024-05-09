@@ -29,14 +29,8 @@ defmodule VacationNestWeb.Router do
 
       live "/", HomeLive.Index, :home
 
-      live "/hotels", HotelsLive.Index, :index
-      live "/hotels/:hotel_id/details", HotelsLive.Show, :show
-
-      pipe_through [:require_authenticated_user]
-
-      live "/partnership", PartnershipLive.Index, :home
-      live "/partnership/add_property", PartnershipLive.Index, :new
-      live "/partnership/add_property/:hotel_id/edit", PartnershipLive.Index, :edit
+      live "/hotel/check", HotelsLive.Index, :index
+      live "/hotel/about", HotelsLive.Show, :show
     end
   end
 
@@ -83,8 +77,38 @@ defmodule VacationNestWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{VacationNestWeb.UserAuth, :ensure_authenticated}] do
+      live "/users/profile", UserProfileLive.Show, :show
+      live "/users/profile/:id", UserProfileLive.Show, :show
+
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+
+      live "/hotel/book", HotelsLive.Index, :book
+      live "/hotel/add_review", HotelsLive.Show, :add_review
+      live "/hotel/edit_review/:review_id", HotelsLive.Show, :edit_review
+
+      live "/hotel/my_bookings", BookingsLive.Index, :my_bookings
+    end
+
+    live_session :require_authenticated_admin,
+      on_mount: [
+        {VacationNestWeb.UserAuth, :ensure_authenticated},
+        {VacationNestWeb.Auth, :admin}
+      ] do
+      live "/hotel/bookings", BookingsLive.Index, :index
+
+      live "/hotel/bookings/:id", BookingsLive.Show, :show
+
+      scope "/admin", Admin do
+        live "/users", UsersLive.Index, :index
+        live "/users/:id", UsersLive.Index, :edit
+
+        live "/rooms", RoomsLive.Index, :index
+        live "/rooms/new", RoomsLive.Index, :new
+        live "/rooms/:id/edit", RoomsLive.Index, :edit
+
+        live "/rooms/:id", RoomsLive.Show, :show
+      end
     end
   end
 end

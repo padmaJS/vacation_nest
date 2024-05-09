@@ -1,75 +1,87 @@
 defmodule VacationNestWeb.HotelsLive.Index do
   use VacationNestWeb, :live_view
 
-  alias VacationNest.Hotels
+  alias VacationNest.Rooms
 
   @impl true
   def render(assigns) do
     ~H"""
-    <.form for={@form} phx-change="validate_and_search">
-      <.input
-        field={@form[:location]}
-        type="select"
-        label="Location"
-        prompt="Select your location"
-        options={["Bhaktapur", "Kathmandu", "Lalitpur"]}
-        required
-      />
-      <.input field={@form[:check_in_day]} type="date" label="Checkin Day" required min={@today} />
-      <.input
-        field={@form[:check_out_day]}
-        type="date"
-        label="Checkout Day"
-        required
-        min={@form[:check_in_day].value || @today}
-      />
-      <.input field={@form[:number_of_rooms]} type="number" label="Number of rooms" required />
+    <div class="grid mx-auto w-1/2 !gap-y-10 bg-gray-50 p-8 my-5 shadow-2xl rounded-lg">
+      <%= if @rooms_available? do %>
+        <.table id="rooms" rows={@rooms}>
+          <:col :let={{room_type, _count, _price}} label="Room Type"><%= room_type %></:col>
+          <:col :let={{_room_type, count, _price}} label="Room Count"><%= count %></:col>
+          <:col :let={{_room_type, _count, price}} label="Room Price"><%= price %></:col>
+        </.table>
+        <div class="mx-auto">
+          <.link
+            navigate={~p"/hotel/book?check_in_day=#{@check_in_day}&check_out_day=#{@check_out_day}"}
+            class="text-white  text-xl bg-[#2EAFA0] hover:bg-[#2A9D8F]  transition duration-300 focus:ring-4 focus:ring-emerald-300 font-semibold rounded-lg px-7 py-3 focus:outline-none transition duration-300"
+          >
+            Book room?
+          </.link>
+        </div>
+      <% else %>
+        Oops. Seems we have no room available for now.
+      <% end %>
+    </div>
 
-      <button>Search</button>
-    </.form>
-
-    <.table id="hotels" rows={@streams.hotels}>
-      <:col :let={{_id, hotel}} label="Name"><%= hotel.name %></:col>
-      <:col :let={{_id, hotel}} label="Rating"><%= hotel.rating %></:col>
-      <:col :let={{_id, hotel}} label="Ratings count"><%= hotel.ratings_count %></:col>
-      <:col :let={{_id, hotel}} label="Location"><%= hotel.location %></:col>
-      <:col :let={{_id, hotel}} label="Verified"><%= hotel.verified %></:col>
-      <:col :let={{_id, hotel}} label="Check in time"><%= hotel.check_in_time %></:col>
-      <:col :let={{_id, hotel}} label="Check out time"><%= hotel.check_out_time %></:col>
-      <:col :let={{_id, hotel}} label="Price Per Room">
-        <%= Hotels.get_price_per_room(hotel) |> :erlang.float_to_binary(decimals: 2) %>
-      </:col>
-      <:action :let={{_id, hotel}}>
-        <.link
-          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-          navigate={
-            ~p"/hotels/#{hotel.id}/details?check_in_day=#{@form[:check_in_day].value}&check_out_day=#{@form[:check_out_day].value}&number_of_rooms=#{@form[:number_of_rooms].value}"
-          }
-        >
-          View Details
-        </.link>
-      </:action>
-    </.table>
+    <.modal
+      :if={@live_action == :book}
+      id="book_room-modal"
+      show
+      on_cancel={
+        JS.patch(~p"/hotel/check?check_in_day=#{@check_in_day}&check_out_day=#{@check_out_day}")
+      }
+    >
+      <.live_component
+        module={VacationNestWeb.HotelsLive.Book}
+        action={@live_action}
+        id="book_room"
+        check_in_day={@check_in_day}
+        check_out_day={@check_out_day}
+        patch={~p"/hotel/check?check_in_day=#{@check_in_day}&check_out_day=#{@check_out_day}"}
+        current_user={@current_user}
+      />
+    </.modal>
     """
   end
 
   @impl true
-  def mount(%{"hotel" => hotel_params}, _session, socket) do
-    today = Date.utc_today() |> Date.to_string()
+  def mount(
+        %{"check_in_day" => check_in_day, "check_out_day" => check_out_day} = params,
+        _session,
+        socket
+      ) do
+    rooms =
+      Rooms.list_room_types_with_room_count(params)
+      |> Enum.map(fn {room_type, count} ->
+        {room_type, count, Rooms.get_price_for_room_type(room_type)}
+      end)
+      |> Enum.sort_by(fn {_room_type, _count, price} -> price.amount end)
+
+    rooms_available? = Rooms.check_room_availability?(params)
 
     {:ok,
      socket
-     |> assign(:today, today)
-     |> stream(:hotels, Hotels.list_hotels(hotel_params))
-     |> assign_form(hotel_params)}
+     |> assign_form(params)
+     |> assign(:rooms, rooms)
+     |> assign(:rooms_available?, rooms_available?)
+     |> assign(:check_in_day, check_in_day)
+     |> assign(:check_out_day, check_out_day)
+     |> assign(:current_page, :book)}
+  end
+
+  @impl true
+  def handle_params(params, _url, socket) do
+    {:noreply, socket |> apply_action(socket.assigns.live_action, params)}
+  end
+
+  defp apply_action(socket, _index, _params) do
+    socket
   end
 
   defp assign_form(socket, changeset) do
     assign(socket, :form, to_form(changeset, as: :hotel))
-  end
-
-  @impl true
-  def handle_event("validate_and_search", %{"hotel" => hotel_params}, socket) do
-    {:noreply, socket |> assign_form(hotel_params)}
   end
 end
