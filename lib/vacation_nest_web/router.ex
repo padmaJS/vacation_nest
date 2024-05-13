@@ -103,6 +103,10 @@ defmodule VacationNestWeb.Router do
         live "/users", UsersLive.Index, :index
         live "/users/:id", UsersLive.Index, :edit
 
+        live "/room_types", RoomTypesLive.Index, :index
+        live "/room_types/new", RoomTypesLive.Index, :new
+        live "/room_types/:id/edit", RoomTypesLive.Index, :edit
+
         live "/rooms", RoomsLive.Index, :index
         live "/rooms/new", RoomsLive.Index, :new
         live "/rooms/:id/edit", RoomsLive.Index, :edit

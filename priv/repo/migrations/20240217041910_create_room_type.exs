@@ -6,6 +6,8 @@ defmodule VacationNest.Repo.Migrations.CreateRoomType do
       add :id, :binary_id, primary_key: true
       add :type, :string
       add :price, :integer
+      add :image, :string
+      add :description, :text
 
       timestamps()
     end

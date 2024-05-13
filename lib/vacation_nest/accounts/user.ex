@@ -71,15 +71,30 @@ defmodule VacationNest.Accounts.User do
     user
     |> cast(attrs, [:email, :name, :profile_image, :password, :phone_number, :gender])
     |> validate_required([:email, :name, :password, :phone_number, :gender])
+    |> validate_name()
     |> validate_email(opts)
     |> validate_password(opts)
     |> validate_phone_number
   end
 
+  defp validate_name(changeset) do
+    case get_field(changeset, :name) do
+      nil ->
+        changeset
+
+      _name ->
+        validate_format(changeset, :name, ~r/^[a-zA-Z]+ [a-zA-Z]+$/,
+          message: "must be alphabetical characters only"
+        )
+    end
+  end
+
   defp validate_email(changeset, opts) do
     changeset
     |> validate_required([:email])
-    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
+    |> validate_format(:email, ~r/^[a-zA-Z0-9_.]+@gmail.[a-zA-Z]+$/,
+      message: "please enter correct mail address"
+    )
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
   end

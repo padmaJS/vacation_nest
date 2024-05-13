@@ -17,10 +17,27 @@ defmodule VacationNest.Rooms do
         |> join(:left, [r], b in assoc(r, :bookings))
         |> where(
           [r, b],
-          is_nil(b.id) or b.check_in_day > ^check_out_day or b.check_out_day < ^check_in_day
+          is_nil(b.id) or b.check_in_day > ^check_out_day or b.check_out_day < ^check_in_day or
+            r.status == :available
         )
-        |> select([r, b], r)
+        |> distinct([r, b], r)
         |> Repo.all()
+
+      overlapping_available_rooms =
+        Room
+        |> join(:left, [r], b in assoc(r, :bookings))
+        |> where(
+          [r, b],
+          (b.check_in_day >= ^check_in_day or b.check_out_day <= ^check_out_day or
+             (b.check_in_day <= ^check_in_day and b.check_out_day >= ^check_out_day)) and
+            b.status not in [:confirmed, :on_going]
+        )
+        |> distinct([r, b], r)
+        |> Repo.all()
+
+      available_rooms =
+        (available_rooms ++ overlapping_available_rooms)
+        |> MapSet.new()
 
       unavailable_rooms =
         Room
@@ -35,19 +52,7 @@ defmodule VacationNest.Rooms do
         |> select([r, b], r.id)
         |> Repo.all()
 
-      overlapping_rooms =
-        Room
-        |> join(:left, [r], b in assoc(r, :bookings))
-        |> where(
-          [r, b],
-          (b.check_in_day >= ^check_in_day or b.check_out_day <= ^check_out_day or
-             (b.check_in_day <= ^check_in_day and b.check_out_day >= ^check_out_day)) and
-            b.status not in [:confirmed, :on_going]
-        )
-        |> distinct([r, b], r)
-        |> Repo.all()
-
-      (available_rooms ++ Enum.filter(overlapping_rooms, &(&1.id not in unavailable_rooms)))
+      Enum.filter(available_rooms, &(&1.id not in unavailable_rooms))
       |> Repo.preload(:room_type)
     else
       []
@@ -63,6 +68,20 @@ defmodule VacationNest.Rooms do
 
   def list_room_types do
     Repo.all(RoomType)
+  end
+
+  def list_room_types(params) do
+    params =
+      params
+      |> Map.put("page_size", 9)
+
+    case Flop.validate_and_run(RoomType, params, for: RoomType) do
+      {:ok, {room_types, meta}} ->
+        %{room_types: room_types, meta: meta}
+
+      {:error, meta} ->
+        %{room_types: [], meta: meta}
+    end
   end
 
   def get_available_room_count_for_room_type(params, type) do
@@ -95,19 +114,21 @@ defmodule VacationNest.Rooms do
       rooms ->
         available_room_types_with_room_count =
           rooms
-          |> Enum.group_by(& &1.room_type.type)
+          |> Enum.group_by(& &1.room_type)
           |> Enum.map(fn {type, rooms} -> {type, Enum.count(rooms)} end)
+
+        available_room_types =
+          Enum.map(available_room_types_with_room_count, fn {type, _} -> type end)
 
         unavailable_room_types_with_room_count =
           list_room_types()
           |> Enum.filter(fn room_type ->
-            room_type.type not in Keyword.keys(available_room_types_with_room_count)
+            room_type not in available_room_types
           end)
-          |> Enum.group_by(& &1.type)
+          |> Enum.group_by(& &1)
           |> Enum.map(fn {room_type, _} -> {room_type, 0} end)
 
         (available_room_types_with_room_count ++ unavailable_room_types_with_room_count)
-        |> Enum.map(fn {key, value} -> {Atom.to_string(key), value} end)
         |> Enum.into(%{})
     end
   end
@@ -242,5 +263,27 @@ defmodule VacationNest.Rooms do
     room
     |> Room.changeset(attrs)
     |> Repo.update()
+  end
+
+  def get_room_type!(id) do
+    Repo.get!(RoomType, id)
+  end
+
+  def create_room_type(attrs) do
+    %RoomType{} |> RoomType.changeset(attrs) |> Repo.insert()
+  end
+
+  def update_room_type(%RoomType{} = room_type, attrs) do
+    room_type
+    |> RoomType.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_room_type(%RoomType{} = room_type) do
+    Repo.delete(room_type)
+  end
+
+  def change_room_type(%RoomType{} = room_type, attrs \\ %{}) do
+    RoomType.changeset(room_type, attrs)
   end
 end

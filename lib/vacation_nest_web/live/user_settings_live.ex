@@ -24,32 +24,35 @@ defmodule VacationNestWeb.UserSettingsLive do
 
             <.input field={@user_form[:phone_number]} type="text" label="Phone Number" required />
 
-            <.live_file_input
-              upload={@uploads.profile_image}
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#325D79] focus:border-[#325D79] block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#325D79] dark:focus:border-[#325D79]"
-            />
-            <%= for entry <- @uploads.profile_image.entries do %>
-              <article class="upload-entry">
-                <figure class="flex items-center">
-                  <.live_img_preview entry={entry} width="150" />
-                  <figcaption><%= entry.client_name %></figcaption>&nbsp;
-                  <button
-                    type="button"
-                    phx-click="cancel-upload"
-                    phx-value-ref={entry.ref}
-                    aria-label="cancel"
-                  >
-                    &times;
-                  </button>
-                </figure>
-              </article>
-              <.error :for={err <- upload_errors(@uploads.profile_image, entry)}>
+            <div>
+              <.label for="profile_image">Profile Image</.label>
+              <.live_file_input
+                upload={@uploads.profile_image}
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#325D79] focus:border-[#325D79] block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#325D79] dark:focus:border-[#325D79] mt-2"
+              />
+              <%= for entry <- @uploads.profile_image.entries do %>
+                <article class="upload-entry">
+                  <figure class="flex items-center">
+                    <.live_img_preview entry={entry} width="150" />
+                    <figcaption><%= entry.client_name %></figcaption>&nbsp;
+                    <button
+                      type="button"
+                      phx-click="cancel-upload"
+                      phx-value-ref={entry.ref}
+                      aria-label="cancel"
+                    >
+                      &times;
+                    </button>
+                  </figure>
+                </article>
+                <.error :for={err <- upload_errors(@uploads.profile_image, entry)}>
+                  <%= error_to_string(err) %>
+                </.error>
+              <% end %>
+              <.error :for={err <- upload_errors(@uploads.profile_image)}>
                 <%= error_to_string(err) %>
               </.error>
-            <% end %>
-            <.error :for={err <- upload_errors(@uploads.profile_image)}>
-              <%= error_to_string(err) %>
-            </.error>
+            </div>
 
             <.input
               field={@user_form[:gender]}
