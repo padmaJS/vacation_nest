@@ -1,7 +1,7 @@
 defmodule VacationNestWeb.Admin.RoomsLive.Index do
   use VacationNestWeb, :live_view
 
-  alias VacationNest.Rooms
+  alias VacationNest.{Rooms, Repo}
   alias VacationNest.Hotels.Room
   import VacationNest.DisplayHelper
 
@@ -119,6 +119,6 @@ defmodule VacationNestWeb.Admin.RoomsLive.Index do
   end
 
   def handle_info({_, {:saved, room}}, socket) do
-    {:noreply, socket |> stream_insert(:rooms, room)}
+    {:noreply, socket |> stream_insert(:rooms, room |> Repo.preload([:room_type]))}
   end
 end

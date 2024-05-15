@@ -83,7 +83,7 @@ defmodule VacationNestWeb.Router do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
 
-      live "/hotel/book", HotelsLive.Index, :book
+      live "/hotel/book", HotelsLive.Book, :index
       live "/hotel/add_review", HotelsLive.Show, :add_review
       live "/hotel/edit_review/:review_id", HotelsLive.Show, :edit_review
 

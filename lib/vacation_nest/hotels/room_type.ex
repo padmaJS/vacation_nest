@@ -9,7 +9,7 @@ defmodule VacationNest.Hotels.RoomType do
   }
 
   schema "room_types" do
-    field :type, Ecto.Enum, values: [:single, :double, :triple]
+    field :type, :string
     field :price, Money.Ecto.Amount.Type
     field :image, :string
     field :description, :string
@@ -21,7 +21,36 @@ defmodule VacationNest.Hotels.RoomType do
 
   def changeset(room_type, attrs) do
     room_type
-    |> cast(attrs, [:type, :price, :image, :description])
-    |> validate_required([:type, :price, :image, :description])
+    |> cast(attrs, [:type, :image, :description])
+    |> validate_required([:type, :description])
+    |> maybe_put_price(attrs)
+    |> maybe_validate_type()
+  end
+
+  defp maybe_put_price(changeset, attrs) do
+    case attrs["price"] do
+      nil ->
+        changeset
+
+      price ->
+        case price |> Money.parse() do
+          {:ok, money} ->
+            changeset |> put_change(:price, money)
+
+          _ ->
+            changeset
+            |> add_error(:price, "Invalid price")
+        end
+    end
+  end
+
+  defp maybe_validate_type(changeset) do
+    case get_field(changeset, :type) do
+      nil ->
+        changeset
+
+      _type ->
+        validate_format(changeset, :type, ~r/^\w+\s?\w*$/, message: "must contain letters only")
+    end
   end
 end

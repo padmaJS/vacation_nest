@@ -14,9 +14,12 @@ defmodule VacationNestWeb.HotelsLive.Index do
             :for={{room_type, count} <- @rooms}
             class="grid grid-cols-3 bg-gray-10 p-4 shadow-xl rounded-lg gap-4"
           >
-            <img src={room_type.image} class="w-[250px] h-[250px]" />
+            <img src={room_type.image} class="w-[250px] h-[250px] object-cover" />
             <div class="grid grid-rows-3">
-              <p class="text-2xl font-semibold row-start-2"><%= humanize_text(room_type.type) %></p>
+              <div class="row-start-2">
+                <p class="text-2xl font-semibold"><%= humanize_text(room_type.type) %></p>
+                <p class="text-gray-500"><%= room_type.description %></p>
+              </div>
               <p class="text-lg font-me  row-start-3">
                 <%= count %> room<%= if count > 1, do: "s" %> available
               </p>
@@ -29,7 +32,7 @@ defmodule VacationNestWeb.HotelsLive.Index do
               <div class="row-start-3">
                 <.link
                   navigate={
-                    ~p"/hotel/book?check_in_day=#{@check_in_day}&check_out_day=#{@check_out_day}"
+                    ~p"/hotel/book?check_in_day=#{@check_in_day}&check_out_day=#{@check_out_day}&room_type=#{room_type.type}"
                   }
                   class="text-white text-xl bg-[#2EAFA0] hover:bg-[#2A9D8F] transition duration-300 focus:ring-4 focus:ring-emerald-300 font-semibold rounded-lg px-7 py-3 focus:outline-none transition duration-300"
                 >
@@ -40,28 +43,11 @@ defmodule VacationNestWeb.HotelsLive.Index do
           </div>
         </div>
       <% else %>
-        Oops. Seems we have no room available for now.
+        <div class="text-2xl font-semibold text-center">
+          Oops. Seems we have no room available for now.
+        </div>
       <% end %>
     </div>
-
-    <.modal
-      :if={@live_action == :book}
-      id="book_room-modal"
-      show
-      on_cancel={
-        JS.patch(~p"/hotel/check?check_in_day=#{@check_in_day}&check_out_day=#{@check_out_day}")
-      }
-    >
-      <.live_component
-        module={VacationNestWeb.HotelsLive.Book}
-        action={@live_action}
-        id="book_room"
-        check_in_day={@check_in_day}
-        check_out_day={@check_out_day}
-        patch={~p"/hotel/check?check_in_day=#{@check_in_day}&check_out_day=#{@check_out_day}"}
-        current_user={@current_user}
-      />
-    </.modal>
     """
   end
 
@@ -72,15 +58,18 @@ defmodule VacationNestWeb.HotelsLive.Index do
         socket
       ) do
     rooms =
-      Rooms.list_room_types_with_room_count(params)
+      Rooms.list_available_room_types_with_room_count(params)
       |> Enum.sort_by(fn {room_type, _count} -> room_type.price.amount end)
 
     rooms_available? = Rooms.check_room_availability?(params)
+
+    room_types = Rooms.list_room_types()
 
     {:ok,
      socket
      |> assign_form(params)
      |> assign(:rooms, rooms)
+     |> assign(:room_types, room_types)
      |> assign(:rooms_available?, rooms_available?)
      |> assign(:check_in_day, check_in_day)
      |> assign(:check_out_day, check_out_day)

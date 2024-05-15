@@ -2,8 +2,8 @@ defmodule VacationNestWeb.Admin.RoomsLive.Show do
   use VacationNestWeb, :live_view
 
   alias VacationNest.Rooms
-  alias VacationNest.Hotels.Room
-  import VacationNest.DisplayHelper
+  # alias VacationNest.Hotels.Room
+  # import VacationNest.DisplayHelper
 
   def render(assigns) do
     ~H"""
@@ -12,7 +12,7 @@ defmodule VacationNestWeb.Admin.RoomsLive.Show do
   end
 
   def mount(%{"id" => id}, _session, socket) do
-    room = Rooms.get_room!(id) |> IO.inspect()
+    room = Rooms.get_room!(id)
     {:ok, socket |> assign(:current_page, :rooms) |> assign(:room, room)}
   end
 end
