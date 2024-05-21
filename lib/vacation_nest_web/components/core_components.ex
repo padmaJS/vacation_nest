@@ -613,7 +613,7 @@ defmodule VacationNestWeb.CoreComponents do
               </path>
             </g>
           </svg>
-          <p>+977 984115345</p>
+          <p>+977 <%= @hotel.phone_number %></p>
         </span>
         <span class="flex space-x-3 items-center">
           <svg
@@ -659,7 +659,7 @@ defmodule VacationNestWeb.CoreComponents do
               </g>
             </g>
           </svg>
-          <p>info@vacationnest.com</p>
+          <p><%= @hotel.email %></p>
         </span>
         <span class="flex space-x-3 items-center">
           <svg
@@ -677,7 +677,7 @@ defmodule VacationNestWeb.CoreComponents do
               </path>
             </g>
           </svg>
-          <a href="#">facebook.com/vacation_nest</a>
+          <a href="#"><%= @hotel.facebook_url %></a>
         </span>
         <span class="flex space-x-3 items-center">
           <svg
@@ -713,11 +713,11 @@ defmodule VacationNestWeb.CoreComponents do
               </path>
             </g>
           </svg>
-          <a href="#">instagram.com/vacation_nest</a>
+          <a href="#"><%= @hotel.instagram_url %></a>
         </span>
       </div>
       <div>
-        <h2 class="text-xl font-semibold">Vacation Nest</h2>
+        <h2 class="text-xl font-semibold"><%= @hotel.name %></h2>
         <span class="flex space-x-3 items-center">
           <svg
             width="20px"
@@ -748,7 +748,7 @@ defmodule VacationNestWeb.CoreComponents do
               </path>
             </g>
           </svg>
-          <p>Nasamana-13, Bhaktapur, Nepal</p>
+          <p><%= @hotel.address %></p>
         </span>
       </div>
     </div>

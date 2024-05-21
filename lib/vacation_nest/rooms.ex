@@ -1,16 +1,14 @@
 defmodule VacationNest.Rooms do
   import Ecto.Query
-  alias VacationNest.Repo
+  alias VacationNest.{Repo, Hotels}
   alias VacationNest.Hotels.{Room, RoomType, Booking, BookingsRooms}
 
-  @check_in_time ~T[14:00:00.00]
-  # @check_out_time ~T[19:00:00]
-
   def list_available_rooms(%{"check_in_day" => check_in_day, "check_out_day" => check_out_day}) do
+    hotel_check_in_time = Hotels.get_hotel().checkin_time
     now = Timex.now("Asia/Kathmandu") |> DateTime.to_time()
     today = Date.utc_today()
 
-    if (Date.from_iso8601!(check_in_day) == today && Timex.compare(now, @check_in_time) == -1) or
+    if (Date.from_iso8601!(check_in_day) == today && Timex.compare(now, hotel_check_in_time) == -1) or
          Date.from_iso8601!(check_in_day) > today do
       available_rooms =
         Room
@@ -206,7 +204,7 @@ defmodule VacationNest.Rooms do
   end
 
   def get_booking!(id) do
-    Repo.get!(Booking, id)
+    Repo.get!(Booking, id) |> Repo.preload([:user, :rooms])
   end
 
   def list_on_going_bookings_between_dates(user, check_in_day, check_out_day) do

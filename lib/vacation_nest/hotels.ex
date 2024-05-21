@@ -56,4 +56,9 @@ defmodule VacationNest.Hotels do
     |> Hotel.changeset(attrs)
     |> Repo.update()
   end
+
+  def change_hotel(attrs \\ %{}) do
+    get_hotel()
+    |> Hotel.changeset(attrs)
+  end
 end

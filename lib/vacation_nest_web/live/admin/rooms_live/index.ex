@@ -40,13 +40,19 @@ defmodule VacationNestWeb.Admin.RoomsLive.Index do
         <:action :let={{id, room}}>
           <div class="flex space-x-2 justify-center">
             <.link
-              class="text-white bg-[#325D79] hover:bg-[#527D99] focus:ring-4 focus:ring-[#325D79] font-medium rounded-lg px-5 py-1.5 focus:outline-none transition duration-300"
+              class="text-white bg-[#325D79] hover:bg-[#527D99] focus:ring-4 focus:ring-[#325D79] font-medium rounded-lg px-5 py-3 mx-1 my-1.5 focus:outline-none transition duration-300"
+              patch={~p"/admin/rooms/#{room.id}"}
+            >
+              Show
+            </.link>
+            <.link
+              class="text-white bg-[#325D79] hover:bg-[#527D99] focus:ring-4 focus:ring-[#325D79] font-medium rounded-lg px-5 py-3 mx-1 my-1.5 focus:outline-none transition duration-300"
               patch={~p"/admin/rooms/#{room.id}/edit"}
             >
               Edit
             </.link>
             <.link
-              class="text-white bg-[#FF5427] hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg px-5 py-1.5 focus:outline-none transition duration-300"
+              class="text-white bg-[#FF5427] hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg px-5 py-3 mx-1 my-1.5 focus:outline-none transition duration-300"
               phx-click={JS.push("delete", value: %{id: room.id}) |> hide("##{id}")}
               data-confirm="Are you sure?"
             >

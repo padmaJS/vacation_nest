@@ -22,6 +22,13 @@ defmodule VacationNestWeb.BookingsLive.Index do
         <:col :let={booking} label="Status"><%= humanize_text(booking.status) %></:col>
         <:col :let={booking} label="Timestamp"><%= format_date(booking.updated_at) %></:col>
         <:action :let={booking}>
+          <.link
+            :if={@current_user.role == :admin}
+            class="text-white bg-[#325D79] hover:bg-[#527D99] focus:ring-4 focus:ring-[#325D79] font-medium rounded-lg px-5 py-3 mx-1 my-1.5 focus:outline-none transition duration-300"
+            patch={~p"/hotel/bookings/#{booking.id}"}
+          >
+            Show
+          </.link>
           <.button
             :if={
               @current_user.role == :admin and booking.status in [:cancelled, :requested] and

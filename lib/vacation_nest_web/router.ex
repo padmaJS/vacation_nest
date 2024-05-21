@@ -115,6 +115,8 @@ defmodule VacationNestWeb.Router do
         live "/rooms/:id/edit", RoomsLive.Index, :edit
 
         live "/rooms/:id", RoomsLive.Show, :show
+
+        live "/hotel_details", HotelsLive, :index
       end
     end
   end

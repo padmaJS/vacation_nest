@@ -13,6 +13,7 @@ defmodule VacationNest.Repo.Migrations.CreateHotels do
       add :email, :string
       add :instagram_url, :string
       add :facebook_url, :string
+      add :phone_number, :string
 
       timestamps()
     end
