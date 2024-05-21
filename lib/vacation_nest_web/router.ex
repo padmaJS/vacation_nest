@@ -83,7 +83,7 @@ defmodule VacationNestWeb.Router do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
 
-      live "/hotel/book", HotelsLive.Index, :book
+      live "/hotel/book", HotelsLive.Book, :index
       live "/hotel/add_review", HotelsLive.Show, :add_review
       live "/hotel/edit_review/:review_id", HotelsLive.Show, :edit_review
 
@@ -95,6 +95,9 @@ defmodule VacationNestWeb.Router do
         {VacationNestWeb.UserAuth, :ensure_authenticated},
         {VacationNestWeb.Auth, :admin}
       ] do
+      live "/edit_room_images", HomeLive.Index, :room_images
+      live "/edit_amenities_images", HomeLive.Index, :amenities_images
+
       live "/hotel/bookings", BookingsLive.Index, :index
 
       live "/hotel/bookings/:id", BookingsLive.Show, :show
@@ -112,6 +115,8 @@ defmodule VacationNestWeb.Router do
         live "/rooms/:id/edit", RoomsLive.Index, :edit
 
         live "/rooms/:id", RoomsLive.Show, :show
+
+        live "/hotel_details", HotelsLive, :index
       end
     end
   end

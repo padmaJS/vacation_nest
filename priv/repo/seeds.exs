@@ -13,10 +13,11 @@ alias VacationNest.Repo
 now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 
 %VacationNest.Accounts.User{
-  email: "admin@handin.org",
+  email: "admin@admin.com",
+  name: "Admin admin",
   role: :admin,
   hashed_password: Bcrypt.hash_pwd_salt("admin"),
-  phone_number: "0",
+  phone_number: "9841152450",
   confirmed_at: now,
   profile_image: "https://picsum.photos/200"
 }
@@ -30,7 +31,7 @@ now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     gender: Enum.random(["male", "female"]),
     role: :guest,
     hashed_password: Bcrypt.hash_pwd_salt("guest"),
-    phone_number: "1",
+    phone_number: "98411524#{i}",
     confirmed_at: now,
     profile_image: "https://picsum.photos/200"
   }
@@ -39,21 +40,27 @@ end)
 
 single =
   %VacationNest.Hotels.RoomType{
-    type: :single,
-    price: Money.new(100_000)
+    type: "Single",
+    price: Money.new(100_000),
+    description: "Contains single bed with plenty of space",
+    image: "/images/room_types/single.jpg"
   }
   |> Repo.insert!()
 
 double =
   %VacationNest.Hotels.RoomType{
-    type: :double,
-    price: Money.new(200_000)
+    type: "Double",
+    price: Money.new(200_000),
+    description: "Contains double bed",
+    image: "/images/room_types/double.jpeg"
   }
   |> Repo.insert!()
 
 %VacationNest.Hotels.RoomType{
-  type: :triple,
-  price: Money.new(300_000)
+  type: "Triple",
+  price: Money.new(300_000),
+  description: "Contains a single bed and a double bed",
+  image: "/images/room_types/triple.jpg"
 }
 |> Repo.insert!()
 
@@ -80,3 +87,27 @@ double =
   }
 ]
 |> Enum.each(&Repo.insert!(&1))
+
+%VacationNest.Hotels.Hotel{
+  name: "Vacation Nest",
+  address: "Nasamana-13, Bhaktapur, Nepal",
+  checkin_time: ~T[14:00:00],
+  checkout_time: ~T[11:00:00],
+  room_images: [
+    "/images/rooms/room1.jpeg",
+    "/images/rooms/room2.jpeg",
+    "/images/rooms/room3.jpeg",
+    "/images/rooms/room4.webp"
+  ],
+  amenities_images: [
+    "/images/amenities/amenities1.jpg",
+    "/images/amenities/amenities2.jpg",
+    "/images/amenities/amenities3.jpg",
+    "/images/amenities/amenities4.jpg",
+    "/images/amenities/corridor.jpg"
+  ],
+  email: "info@vacation_nest.com",
+  instagram_url: "https://www.instagram.com/vacation_nest/",
+  facebook_url: "https://www.facebook.com/vacation_nest/"
+}
+|> Repo.insert!()

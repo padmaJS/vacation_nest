@@ -24,4 +24,8 @@ defmodule VacationNest.DisplayHelper do
   end
 
   def humanize_text(_), do: ""
+
+  def format_time(time) do
+    Timex.format!(time, "%I:%M %p", :strftime)
+  end
 end

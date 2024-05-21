@@ -1,24 +1,23 @@
 defmodule VacationNest.Rooms do
   import Ecto.Query
-  alias VacationNest.Repo
+  alias VacationNest.{Repo, Hotels}
   alias VacationNest.Hotels.{Room, RoomType, Booking, BookingsRooms}
 
-  @check_in_time ~T[14:00:00.00]
-  # @check_out_time ~T[19:00:00]
-
-  def get_available_rooms(%{"check_in_day" => check_in_day, "check_out_day" => check_out_day}) do
+  def list_available_rooms(%{"check_in_day" => check_in_day, "check_out_day" => check_out_day}) do
+    hotel_check_in_time = Hotels.get_hotel().checkin_time
     now = Timex.now("Asia/Kathmandu") |> DateTime.to_time()
     today = Date.utc_today()
 
-    if (Date.from_iso8601!(check_in_day) == today && Timex.compare(now, @check_in_time) == -1) or
+    if (Date.from_iso8601!(check_in_day) == today && Timex.compare(now, hotel_check_in_time) == -1) or
          Date.from_iso8601!(check_in_day) > today do
       available_rooms =
         Room
         |> join(:left, [r], b in assoc(r, :bookings))
         |> where(
           [r, b],
-          is_nil(b.id) or b.check_in_day > ^check_out_day or b.check_out_day < ^check_in_day or
-            r.status == :available
+          is_nil(b.id) or b.check_in_day > ^check_out_day or
+            (b.check_out_day < ^check_in_day and
+               r.status == :available)
         )
         |> distinct([r, b], r)
         |> Repo.all()
@@ -44,9 +43,12 @@ defmodule VacationNest.Rooms do
         |> join(:left, [r], b in assoc(r, :bookings))
         |> where(
           [r, b],
-          (b.check_in_day >= ^check_in_day or b.check_out_day <= ^check_out_day or
-             (b.check_in_day <= ^check_in_day and b.check_out_day >= ^check_out_day)) and
-            b.status in [:confirmed, :on_going]
+          (((b.check_in_day >= ^check_in_day and b.check_out_day >= ^check_out_day and
+               b.check_in_day <= ^check_out_day) or
+              (b.check_out_day <= ^check_out_day and b.check_in_day <= ^check_in_day and
+                 b.check_in_day >= ^check_in_day) or
+              (b.check_in_day <= ^check_in_day and b.check_out_day >= ^check_out_day)) and
+             b.status in [:confirmed, :on_going]) or r.status == :unavailable
         )
         |> distinct([r, b], r)
         |> select([r, b], r.id)
@@ -85,7 +87,7 @@ defmodule VacationNest.Rooms do
   end
 
   def get_available_room_count_for_room_type(params, type) do
-    case get_available_rooms(params) do
+    case list_available_rooms(params) do
       [] ->
         0
 
@@ -93,7 +95,7 @@ defmodule VacationNest.Rooms do
         rooms =
           rooms
           |> Enum.group_by(& &1.room_type.type)
-          |> Enum.filter(fn {key, _} -> key == type end)
+          |> Enum.filter(fn {key, _} -> key == type.type end)
 
         {_, count} =
           if rooms == [] do
@@ -106,37 +108,32 @@ defmodule VacationNest.Rooms do
     end
   end
 
-  def list_room_types_with_room_count(params) do
-    case get_available_rooms(params) do
+  def list_available_room_types_with_room_count(params) do
+    case list_available_rooms(params) do
       [] ->
         %{}
 
       rooms ->
-        available_room_types_with_room_count =
-          rooms
-          |> Enum.group_by(& &1.room_type)
-          |> Enum.map(fn {type, rooms} -> {type, Enum.count(rooms)} end)
-
-        available_room_types =
-          Enum.map(available_room_types_with_room_count, fn {type, _} -> type end)
-
-        unavailable_room_types_with_room_count =
-          list_room_types()
-          |> Enum.filter(fn room_type ->
-            room_type not in available_room_types
-          end)
-          |> Enum.group_by(& &1)
-          |> Enum.map(fn {room_type, _} -> {room_type, 0} end)
-
-        (available_room_types_with_room_count ++ unavailable_room_types_with_room_count)
+        rooms
+        |> Enum.group_by(& &1.room_type)
+        |> Enum.map(fn {type, rooms} -> {type, Enum.count(rooms)} end)
         |> Enum.into(%{})
     end
+  end
+
+  def get_room_count_for(params, type) do
+    list_available_room_types_with_room_count(params)
+    |> Map.filter(fn {key, _} ->
+      key.type == type
+    end)
+    |> Map.values()
+    |> Enum.at(0) || 0
   end
 
   def check_room_availability_for_booking?(
         %Booking{check_in_day: check_in_day, check_out_day: check_out_day} = booking
       ) do
-    case get_available_rooms(%{
+    case list_available_rooms(%{
            "check_in_day" => Date.to_string(check_in_day),
            "check_out_day" => Date.to_string(check_out_day)
          }) do
@@ -155,7 +152,7 @@ defmodule VacationNest.Rooms do
   end
 
   def check_room_availability?(params) do
-    if get_available_rooms(params) == [], do: false, else: true
+    if list_available_rooms(params) == [], do: false, else: true
   end
 
   def create_booking_for_room(params) do
@@ -168,8 +165,8 @@ defmodule VacationNest.Rooms do
            user_id: params["user_id"]
          }) do
       {:ok, booking} ->
-        get_available_rooms(params)
-        |> Enum.filter(fn room -> room.room_type.type == String.to_atom(params["room_type"]) end)
+        list_available_rooms(params)
+        |> Enum.filter(fn room -> room.room_type.type == params["room_type"] end)
         |> Enum.slice(0..(room_count - 1))
         |> Enum.each(&create_bookings_rooms(%{"booking_id" => booking.id, "room_id" => &1.id}))
 
@@ -207,7 +204,7 @@ defmodule VacationNest.Rooms do
   end
 
   def get_booking!(id) do
-    Repo.get!(Booking, id)
+    Repo.get!(Booking, id) |> Repo.preload([:user, :rooms])
   end
 
   def list_on_going_bookings_between_dates(user, check_in_day, check_out_day) do
@@ -267,6 +264,12 @@ defmodule VacationNest.Rooms do
 
   def get_room_type!(id) do
     Repo.get!(RoomType, id)
+  end
+
+  def get_room_type_by_type(type) do
+    RoomType
+    |> where([rt], rt.type == ^type)
+    |> Repo.one()
   end
 
   def create_room_type(attrs) do

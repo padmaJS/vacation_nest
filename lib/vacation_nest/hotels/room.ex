@@ -26,6 +26,7 @@ defmodule VacationNest.Hotels.Room do
   def changeset(room, attrs) do
     room
     |> cast(attrs, @attrs)
+    |> validate_required(@attrs)
     |> unique_constraint(:room_number)
   end
 end

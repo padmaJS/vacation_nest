@@ -19,12 +19,12 @@ defmodule VacationNestWeb.Admin.RoomTypesLive.FormComponent do
         phx-submit="save"
       >
         <div>
-          <.label for="room_image">Room Image</.label>
+          <.label for="image">Room Image</.label>
           <.live_file_input
-            upload={@uploads.room_image}
+            upload={@uploads.image}
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#325D79] focus:border-[#325D79] block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#325D79] dark:focus:border-[#325D79] mt-2"
           />
-          <%= for entry <- @uploads.room_image.entries do %>
+          <%= for entry <- @uploads.image.entries do %>
             <article class="upload-entry">
               <figure class="flex items-center">
                 <.live_img_preview entry={entry} width="150" />
@@ -39,28 +39,21 @@ defmodule VacationNestWeb.Admin.RoomTypesLive.FormComponent do
                 </button>
               </figure>
             </article>
-            <.error :for={err <- upload_errors(@uploads.room_image, entry)}>
+            <.error :for={err <- upload_errors(@uploads.image, entry)}>
               <%= error_to_string(err) %>
             </.error>
           <% end %>
-          <.error :for={err <- upload_errors(@uploads.room_image)}>
+          <.error :for={err <- upload_errors(@uploads.image)}>
             <%= error_to_string(err) %>
           </.error>
         </div>
 
-        <.input
-          field={@form[:room_type_id]}
-          type="select"
-          label="Room Type"
-          options={Rooms.list_room_types() |> Enum.map(&{&1.type, &1.id})}
-        />
-        <.input
-          field={@form[:status]}
-          type="select"
-          label="Status"
-          options={[:available, :unavailable]}
-        />
-        <.input field={@form[:description]} type="text" label="Description" />
+        <.input field={@form[:type]} type="text" label="Type" required />
+
+        <.input field={@form[:price]} type="text" label="Price" required />
+
+        <.input field={@form[:description]} type="text" label="Description" required />
+
         <:actions>
           <.button
             class="text-white bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg px-5 py-1.5 transition duration-300"
@@ -89,7 +82,7 @@ defmodule VacationNestWeb.Admin.RoomTypesLive.FormComponent do
      |> assign(assigns)
      |> assign_form(changeset)
      |> assign(:uploaded_files, [])
-     |> allow_upload(:room_image,
+     |> allow_upload(:image,
        accept: ~w(.jpg .jpeg .png),
        max_entries: 1
      )}
@@ -107,24 +100,24 @@ defmodule VacationNestWeb.Admin.RoomTypesLive.FormComponent do
 
   def handle_event("save", %{"room_type" => room_type_params}, socket) do
     uploaded_files =
-      consume_uploaded_entries(socket, :room_image, fn %{path: path}, _entry ->
+      consume_uploaded_entries(socket, :image, fn %{path: path}, _entry ->
         dest =
           Path.join([
             :code.priv_dir(:vacation_nest),
             "static",
             "uploads",
-            "room_type",
+            "room_types",
             Path.basename(path)
           ])
 
         File.mkdir_p!(Path.dirname(dest))
         File.cp!(path, dest)
-        {:ok, "/uploads/" <> Path.basename(dest)}
+        {:ok, "/uploads/room_types/" <> Path.basename(dest)}
       end)
 
     room_type_params =
       if uploaded_files != [],
-        do: Map.put(room_type_params, "room_image", List.first(uploaded_files)),
+        do: Map.put(room_type_params, "image", List.first(uploaded_files)),
         else: room_type_params
 
     save_room_type(

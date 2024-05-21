@@ -189,6 +189,17 @@
             Home
           </.link>
         </li>
+        <li :if={@current_user && @current_user.role == :admin}>
+          <.link
+            href={~p"/admin/hotel_details"}
+            class={[
+              "block text-gray-900 transition duration-300 md:border-b-2  md:hover:border-b-2 md:hover:border-b-[#7BB7B1] md:p-0",
+              @current_page == :dashboard && "!text-[#7BB7B1] border-b-[#7BB7B1]"
+            ]}
+          >
+            Details
+          </.link>
+        </li>
         <li :if={@current_user}>
           <.link
             href={~p"/users/profile"}

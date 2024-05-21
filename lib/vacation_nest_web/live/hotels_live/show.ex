@@ -10,13 +10,13 @@ defmodule VacationNestWeb.HotelsLive.Show do
     ~H"""
     <div class="min-h-screen min-w-screen bg-[url('/images/hotel_scenary1.jpg')] bg-cover grid grid-cols-4 grid-rows-3 justify-items-center">
       <div class="col-span-2 row-start-2 col-start-1">
-        <h1 class="text-7xl font-semibold">Vacation Nest</h1>
+        <h1 class="text-7xl font-semibold"><%= @hotel.name %></h1>
       </div>
       <div class="row-start-2 col-start-3 text-2xl font-semibold">
         <p class="text-gray-600">Your Tranquil Escape in the Heart of Bhaktapur.</p>
-        <p>Check-in: 2:00 PM</p>
-        <p>Check-out: 11:00 AM</p>
-        <p>Nasamana 13, Bhaktapur, Nepal</p>
+        <p>Check-in: <%= DisplayHelper.format_time @hotel.checkin_time %></p>
+        <p>Check-out: <%= DisplayHelper.format_time @hotel.checkout_time %></p>
+        <p><%= @hotel.address %></p>
       </div>
     </div>
 
@@ -126,7 +126,7 @@ defmodule VacationNestWeb.HotelsLive.Show do
         <p class="text-gray-700 text-sm mt-4">No reviews yet. Be the first to write one!</p>
       <% end %>
     </div>
-    <.contact_us_footer />
+    <.contact_us_footer hotel={Hotels.get_hotel}/>
 
     <.modal
       :if={@live_action in [:add_review, :edit_review]}
@@ -174,6 +174,7 @@ defmodule VacationNestWeb.HotelsLive.Show do
 
     {:ok,
      socket
+     |> assign(:hotel, Hotels.get_hotel())
      |> assign(:reviews, reviews)
      |> assign(:rating, rating)
      |> assign(:amenities, amenities)
