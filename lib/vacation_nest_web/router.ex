@@ -95,6 +95,9 @@ defmodule VacationNestWeb.Router do
         {VacationNestWeb.UserAuth, :ensure_authenticated},
         {VacationNestWeb.Auth, :admin}
       ] do
+      live "/edit_room_images", HomeLive.Index, :room_images
+      live "/edit_amenities_images", HomeLive.Index, :amenities_images
+
       live "/hotel/bookings", BookingsLive.Index, :index
 
       live "/hotel/bookings/:id", BookingsLive.Show, :show

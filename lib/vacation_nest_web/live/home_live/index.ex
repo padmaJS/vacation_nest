@@ -1,4 +1,5 @@
 defmodule VacationNestWeb.HomeLive.Index do
+  alias VacationNest.Hotels
   use VacationNestWeb, :live_view
 
   @impl true
@@ -51,11 +52,20 @@ defmodule VacationNestWeb.HomeLive.Index do
         </.header>
       </div>
       <div>
-        <div class="m-4 text-xl font-semibold">Take a glance at our rooms:</div>
+        <div class="flex">
+          <div class="m-4 text-xl font-semibold">Take a glance at our rooms:</div>
+          <.link
+            :if={@current_user && @current_user.role == :admin}
+            navigate={~p"/edit_room_images"}
+            class="bg-[#325D79] hover:bg-[#527D99] py-[5px] text-white px-4 my-3 rounded-md shadow-sm transition duration-300"
+          >
+            Edit
+          </.link>
+        </div>
         <div id="slideshow" class="flex overflow-x-scroll whitespace-nowrap scroll-smooth pb-4">
           <div class="flex items-center">
-            <%= for picture <- @room_pictures do %>
-              <img src={picture} class="w-screen h-64 object-cover mr-4" />
+            <%= for picture <- @hotel.room_images do %>
+              <img src={picture} class="w-screen h-64 object-cover mr-2" />
             <% end %>
           </div>
         </div>
@@ -69,33 +79,48 @@ defmodule VacationNestWeb.HomeLive.Index do
           </li>
         </ul>
       </section>
-      <div class="m-4 text-xl font-semibold">Take a glance at our amenities:</div>
+      <div class="flex">
+        <div class="m-4 text-xl font-semibold">Take a glance at our amenities:</div>
+        <.link
+          :if={@current_user && @current_user.role == :admin}
+          navigate={~p"/edit_amenities_images"}
+          class="bg-[#325D79] hover:bg-[#527D99] py-[5px] text-white px-4 my-3 rounded-md shadow-sm transition duration-300"
+        >
+          Edit
+        </.link>
+      </div>
       <div id="slideshow" class="flex overflow-x-scroll whitespace-nowrap scroll-smooth pb-4">
         <div class="flex items-center">
-          <%= for picture <- @amenities_pictures do %>
-            <img src={picture} class="w-screen h-64 object-cover mr-4" />
+          <%= for picture <- @hotel.amenities_images do %>
+            <img src={picture} class="w-screen h-64 object-cover mr-2" />
           <% end %>
         </div>
       </div>
       <.contact_us_footer />
     </div>
+    <.modal
+      :if={@live_action in [:amenities_images, :room_images]}
+      id="images-edit-modal"
+      show
+      on_cancel={JS.patch(~p"/")}
+    >
+      <.live_component
+        module={VacationNestWeb.HomeLive.ImageUploadComponent}
+        id={:new}
+        action={@live_action}
+        title={@title}
+        hotel={@hotel}
+        patch={~p"/"}
+      />
+    </.modal>
     """
   end
 
   @impl true
   def mount(_params, _session, socket) do
+    hotel = Hotels.get_hotel()
     today = Date.utc_today() |> Date.to_string()
     tomorrow = Date.utc_today() |> Date.add(1) |> Date.to_string()
-
-    room_pictures =
-      Path.join([:code.priv_dir(:vacation_nest), "static", "images", "rooms"])
-      |> File.ls!()
-      |> Enum.map(fn x -> ~p"/images/rooms/#{x}" end)
-
-    amenities_pictures =
-      Path.join([:code.priv_dir(:vacation_nest), "static", "images", "amenities"])
-      |> File.ls!()
-      |> Enum.map(fn x -> ~p"/images/amenities/#{x}" end)
 
     description = [
       {"Immerse yourself in Newari culture",
@@ -112,10 +137,9 @@ defmodule VacationNestWeb.HomeLive.Index do
      socket
      |> assign(:current_page, :home)
      |> assign(:today, today)
+     |> assign(:hotel, hotel)
      |> assign(:tomorrow, tomorrow)
      |> assign(:description, description)
-     |> assign(:room_pictures, room_pictures)
-     |> assign(:amenities_pictures, amenities_pictures)
      |> assign_form()}
   end
 
@@ -123,9 +147,30 @@ defmodule VacationNestWeb.HomeLive.Index do
     assign(socket, :form, to_form(changeset))
   end
 
+  def handle_params(params, _, socket) do
+    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  defp apply_action(socket, :room_images, _params) do
+    socket |> assign(:title, "Room Images")
+  end
+
+  defp apply_action(socket, :amenities_images, _params) do
+    socket |> assign(:title, "Amenities Images")
+  end
+
+  defp apply_action(socket, _, _params) do
+    socket
+  end
+
   @impl true
   def handle_event("validate", hotel_params, socket) do
     {:noreply, socket |> assign_form(hotel_params)}
+  end
+
+  @impl true
+  def handle_info({_, {:saved, _}}, socket) do
+    {:noreply, assign(socket, :hotel, Hotels.get_hotel())}
   end
 
   defp get_tomorrow(nil), do: nil

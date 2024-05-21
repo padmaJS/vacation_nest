@@ -87,3 +87,27 @@ double =
   }
 ]
 |> Enum.each(&Repo.insert!(&1))
+
+%VacationNest.Hotels.Hotel{
+  name: "Vacation Nest",
+  address: "Nasamana-13, Bhaktapur, Nepal",
+  checkin_time: ~T[14:00:00],
+  checkout_time: ~T[11:00:00],
+  room_images: [
+    "/images/rooms/room1.jpeg",
+    "/images/rooms/room2.jpeg",
+    "/images/rooms/room3.jpeg",
+    "/images/rooms/room4.webp"
+  ],
+  amenities_images: [
+    "/images/amenities/amenities1.jpg",
+    "/images/amenities/amenities2.jpg",
+    "/images/amenities/amenities3.jpg",
+    "/images/amenities/amenities4.jpg",
+    "/images/amenities/corridor.jpg"
+  ],
+  email: "info@vacation_nest.com",
+  instagram_url: "https://www.instagram.com/vacation_nest/",
+  facebook_url: "https://www.facebook.com/vacation_nest/"
+}
+|> Repo.insert!()
