@@ -13,6 +13,8 @@ defmodule VacationNest.Hotels.Room do
     field :room_number, :integer
     field :status, Ecto.Enum, values: [:available, :unavailable], default: :available
 
+    belongs_to :hotel, VacationNest.Hotels.Hotel
+
     belongs_to :room_type, VacationNest.Hotels.RoomType
 
     many_to_many :bookings, VacationNest.Hotels.Booking,
