@@ -21,6 +21,7 @@ defmodule VacationNest.Repo.Migrations.CreateHotels do
       timestamps()
     end
 
-      create unique_index(:hotels, [:email]). unique_index(:hotels, [:phone_number]), unique_index(:hotels, [:facebook_url]), unique_index(:hotels, [:instagram_url])
+    create unique_index(:hotels, [:email, :phone_number, :facebook_url, :instagram_url])
+
   end
 end
