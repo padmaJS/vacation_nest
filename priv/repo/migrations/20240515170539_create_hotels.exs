@@ -14,8 +14,13 @@ defmodule VacationNest.Repo.Migrations.CreateHotels do
       add :instagram_url, :string
       add :facebook_url, :string
       add :phone_number, :string
+      add :rating, :float
+      add :ratings_count, :integer
+      add :verified, :boolean, default: false
 
       timestamps()
     end
+
+      create unique_index(:hotels, [:email]). unique_index(:hotels, [:phone_number]), unique_index(:hotels, [:facebook_url]), unique_index(:hotels, [:instagram_url])
   end
 end

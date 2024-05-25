@@ -8,6 +8,8 @@ defmodule VacationNest.Hotels.Review do
 
     belongs_to :user, VacationNest.Accounts.User
 
+    belongs_to :hotel, VacationNest.Hotels.Hotel
+
     timestamps()
   end
 

@@ -13,5 +13,6 @@ defmodule VacationNest.Repo.Migrations.CreateReviews do
     end
 
     create unique_index(:reviews, [:user_id])
+    create index(:reviews, [:hotel_id])
   end
 end
