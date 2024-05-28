@@ -8,10 +8,12 @@ defmodule VacationNest.Repo.Migrations.CreateReviews do
       add :comment, :text
 
       add :user_id, references(:users, type: :uuid)
+      add :hotel_id, references(:hotels, type: :uuid)
 
       timestamps()
     end
 
     create unique_index(:reviews, [:user_id])
+    create index(:reviews, [:hotel_id])
   end
 end

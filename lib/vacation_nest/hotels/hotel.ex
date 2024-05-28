@@ -14,13 +14,17 @@ defmodule VacationNest.Hotels.Hotel do
     field :phone_number, :string
     field :instagram_url, :string
     field :facebook_url, :string
-
+    field :rating, :float
+    field :ratings_count, :integer
+    field :verified, :boolean, default: false
+    has_many :rooms, VacationNest.Hotels.Room
+    has_many :reviews, VacationNest.Hotels.Review
     timestamps()
   end
 
   def changeset(hotel, attrs) do
     hotel
-    |> cast(attrs, [:name, :checkin_time, :checkout_time, :room_images, :amenities_images, :phone_number, :email, :address, :instagram_url, :facebook_url])
+    |> cast(attrs, [:name, :checkin_time, :checkout_time, :room_images, :amenities_images, :phone_number, :email, :address, :instagram_url, :facebook_url, :rating, :ratings_count, :verified])
     |> maybe_validate_phone_number(attrs)
   end
 

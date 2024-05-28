@@ -7,6 +7,7 @@ defmodule VacationNest.Repo.Migrations.CreateRooms do
       add :room_number, :integer
       add :status, :string
       add :room_type_id, references(:room_types, type: :uuid)
+      add :hotel_id, references(:hotels, type: :uuid)
 
       timestamps()
     end
