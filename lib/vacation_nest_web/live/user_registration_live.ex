@@ -27,10 +27,6 @@ defmodule VacationNestWeb.UserRegistrationLive do
         action={~p"/users/log_in?_action=registered"}
         method="post"
       >
-        <.error :if={@check_errors}>
-          Oops, something went wrong! Please check the errors below.
-        </.error>
-
         <div>
           <.label for="profile_image">Profile Image</.label>
           <.live_file_input
@@ -61,8 +57,8 @@ defmodule VacationNestWeb.UserRegistrationLive do
           </.error>
         </div>
 
-        <.input field={@form[:email]} type="email" label="Email" required />
-        <.input field={@form[:name]} type="text" label="Name" required />
+        <.input field={@form[:email]} type="email" label="Email" />
+        <.input field={@form[:name]} type="text" label="Name" />
 
         <.input
           field={@form[:gender]}
@@ -70,17 +66,11 @@ defmodule VacationNestWeb.UserRegistrationLive do
           type="select"
           options={["male", "female"]}
           prompt="Select your gender"
-          required
         />
 
-        <.input field={@form[:phone_number]} type="text" label="Phone Number" required />
-        <.input field={@form[:password]} type="password" label="Password" required />
-        <.input
-          field={@form[:password_confirmation]}
-          type="password"
-          label="Confirm Password"
-          required
-        />
+        <.input field={@form[:phone_number]} type="text" label="Phone Number" />
+        <.input field={@form[:password]} type="password" label="Password" />
+        <.input field={@form[:password_confirmation]} type="password" label="Confirm Password" />
 
         <:actions>
           <.button
@@ -126,7 +116,7 @@ defmodule VacationNestWeb.UserRegistrationLive do
     user_params =
       if uploaded_files != [],
         do: Map.put(user_params, "profile_image", List.first(uploaded_files)),
-        else: user_params
+        else: Map.put(user_params, "profile_image", "/images/avatar-default.svg")
 
     case Accounts.register_user(user_params) do
       {:ok, user} ->

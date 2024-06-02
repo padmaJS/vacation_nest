@@ -29,7 +29,7 @@ defmodule VacationNest.Accounts.UserNotifier do
 
     You can confirm your account by visiting the URL below:
 
-    #{url}
+    <a href="#{url}">Click here to confirm</a>
 
     If you didn't create an account with us, please ignore this.
 
@@ -49,7 +49,7 @@ defmodule VacationNest.Accounts.UserNotifier do
 
     You can reset your password by visiting the URL below:
 
-    #{url}
+    <a href="#{url}">Click here to change your password</a>
 
     If you didn't request this change, please ignore this.
 
@@ -69,7 +69,7 @@ defmodule VacationNest.Accounts.UserNotifier do
 
     You can change your email by visiting the URL below:
 
-    #{url}
+    <a href="#{url}">Click here to change your email</a>
 
     If you didn't request this change, please ignore this.
 

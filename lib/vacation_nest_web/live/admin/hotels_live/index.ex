@@ -14,7 +14,6 @@ defmodule VacationNestWeb.Admin.HotelsLive do
       <div class="space-y-12 divide-y pt-4">
         <div>
           <.simple_form for={@form} phx-submit="save" phx-change="validate">
-            <.input field={@form[:name]} type="text" label="Name" required />
             <.input field={@form[:address]} type="text" label="Address" required />
             <.input field={@form[:phone_number]} type="text" label="Phone Number" required />
             <.input field={@form[:email]} type="text" label="Email" required />

@@ -14,8 +14,8 @@ defmodule VacationNestWeb.HotelsLive.Show do
       </div>
       <div class="row-start-2 col-start-3 text-2xl font-semibold">
         <p class="text-gray-600">Your Tranquil Escape in the Heart of Bhaktapur.</p>
-        <p>Check-in: <%= DisplayHelper.format_time @hotel.checkin_time %></p>
-        <p>Check-out: <%= DisplayHelper.format_time @hotel.checkout_time %></p>
+        <p>Check-in: <%= DisplayHelper.format_time(@hotel.checkin_time) %></p>
+        <p>Check-out: <%= DisplayHelper.format_time(@hotel.checkout_time) %></p>
         <p><%= @hotel.address %></p>
       </div>
     </div>
@@ -66,10 +66,7 @@ defmodule VacationNestWeb.HotelsLive.Show do
           <div :if={@user_review} class="flex flex-col border-b py-4 px-4 hover:bg-gray-100">
             <div class="flex items-center mb-2">
               <span class="font-bold text-gray-800 text-lg flex space-x-1 items-center">
-                <img
-                  src={@current_user.profile_image || "/images/avatar-default.svg"}
-                  class="w-[20px] h-[20px] rounded-full"
-                />
+                <img src={@current_user.profile_image} class="w-[20px] h-[20px] rounded-full" />
                 <p><%= @current_user.email %></p>
               </span>
               <span class="ml-2 text-yellow-500">
@@ -98,10 +95,7 @@ defmodule VacationNestWeb.HotelsLive.Show do
             <div class="flex flex-col border-b py-4 px-4 hover:bg-gray-100">
               <div class="flex items-center mb-2">
                 <span class="font-bold text-gray-800 text-lg flex space-x-1 items-center">
-                  <img
-                    src={review.user.profile_image || "/images/avatar-default.svg"}
-                    class="w-[20px] h-[20px] rounded-full"
-                  />
+                  <img src={review.user.profile_image} class="w-[20px] h-[20px] rounded-full" />
                   <a href={~p"/users/profile/#{review.user.id}"}>
                     <%= review.user.email %>
                   </a>
@@ -126,7 +120,7 @@ defmodule VacationNestWeb.HotelsLive.Show do
         <p class="text-gray-700 text-sm mt-4">No reviews yet. Be the first to write one!</p>
       <% end %>
     </div>
-    <.contact_us_footer hotel={Hotels.get_hotel}/>
+    <.contact_us_footer hotel={Hotels.get_hotel()} />
 
     <.modal
       :if={@live_action in [:add_review, :edit_review]}

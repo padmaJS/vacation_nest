@@ -11,7 +11,7 @@ defmodule VacationNestWeb.BookingsLive.Show do
         <div class="flex flex-col space-y-4 py-4 items-center justify-center">
           <img
             class="w-40 h-40 rounded-full object-cover mx-auto"
-            src={@booking.user.profile_image || "/images/avatar-default.svg"}
+            src={@booking.user.profile_image}
             alt="Profile Picture"
           />
           <h2 class="text-2xl font-bold text-center md:text-left"><%= @booking.user.name %></h2>
@@ -43,7 +43,7 @@ defmodule VacationNestWeb.BookingsLive.Show do
       <.table id="bookings" rows={[@booking]}>
         <:col :let={booking} label="Amount"><%= booking.total_amount %></:col>
         <:col :let={booking} label="Room NUmbers">
-           <%= booking.rooms |> Enum.map(& &1.room_number) |> Enum.join(", ") %>
+          <%= booking.rooms |> Enum.map(& &1.room_number) |> Enum.join(", ") %>
         </:col>
         <:col :let={booking} label="Check in day"><%= booking.check_in_day %></:col>
         <:col :let={booking} label="Check out day"><%= booking.check_out_day %></:col>

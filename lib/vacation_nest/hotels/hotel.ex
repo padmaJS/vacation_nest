@@ -20,13 +20,26 @@ defmodule VacationNest.Hotels.Hotel do
 
   def changeset(hotel, attrs) do
     hotel
-    |> cast(attrs, [:name, :checkin_time, :checkout_time, :room_images, :amenities_images, :phone_number, :email, :address, :instagram_url, :facebook_url])
+    |> cast(attrs, [
+      :name,
+      :checkin_time,
+      :checkout_time,
+      :room_images,
+      :amenities_images,
+      :phone_number,
+      :email,
+      :address,
+      :instagram_url,
+      :facebook_url
+    ])
     |> maybe_validate_phone_number(attrs)
   end
 
   defp maybe_validate_phone_number(changeset, _attrs) do
     changeset
-    |> validate_format(:phone_number, ~r/^98[0-9]{8}$/, message: "must be a valid phone number")
+    |> validate_format(:phone_number, ~r/^9[678][0-9]{8}$/,
+      message: "must be a valid phone number"
+    )
     |> unique_constraint(:phone_number)
   end
 end

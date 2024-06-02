@@ -18,7 +18,7 @@ defmodule VacationNestWeb.UserProfileLive.Show do
         <div class="flex flex-col space-y-4 py-4 items-center justify-center">
           <img
             class="w-40 h-40 rounded-full object-cover mx-auto"
-            src={@user.profile_image || "/images/avatar-default.svg"}
+            src={@user.profile_image}
             alt="Profile Picture"
           />
           <h2 class="text-2xl font-bold text-center md:text-left"><%= @user.name %></h2>

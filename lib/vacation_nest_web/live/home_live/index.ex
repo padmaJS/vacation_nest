@@ -96,7 +96,7 @@ defmodule VacationNestWeb.HomeLive.Index do
           <% end %>
         </div>
       </div>
-      <.contact_us_footer hotel={@hotel}/>
+      <.contact_us_footer hotel={@hotel} />
     </div>
     <.modal
       :if={@live_action in [:amenities_images, :room_images]}

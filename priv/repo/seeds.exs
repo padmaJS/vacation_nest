@@ -93,6 +93,7 @@ double =
   address: "Nasamana-13, Bhaktapur, Nepal",
   checkin_time: ~T[14:00:00],
   checkout_time: ~T[11:00:00],
+  phone_number: "9841152450",
   room_images: [
     "/images/rooms/room1.jpeg",
     "/images/rooms/room2.jpeg",

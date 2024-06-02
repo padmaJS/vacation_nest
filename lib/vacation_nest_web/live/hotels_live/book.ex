@@ -135,8 +135,8 @@ defmodule VacationNestWeb.HotelsLive.Book do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Room book requested successfully.")
-         |> push_navigate(to: ~p"/")}
+         |> put_flash(:info, "Room booking requested successfully.")
+         |> push_navigate(to: ~p"/hotel/my_bookings")}
 
       on_going_bookings != [] ->
         {:noreply,

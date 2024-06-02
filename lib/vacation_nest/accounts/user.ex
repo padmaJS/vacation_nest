@@ -1,6 +1,8 @@
 defmodule VacationNest.Accounts.User do
   use VacationNest.Schema
   import Ecto.Changeset
+  alias VacationNest.Repo
+  alias VacationNest.Accounts.User
 
   @derive {
     Flop.Schema,
@@ -53,18 +55,13 @@ defmodule VacationNest.Accounts.User do
     |> validate_required([:email, :name, :phone_number, :gender])
     |> maybe_validate_phone_number(attrs)
     |> validate_email(attrs)
+    |> validate_name()
   end
 
   def edit_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email, :role, :name, :phone_number, :gender])
     |> validate_email(opts)
-  end
-
-  defp maybe_validate_phone_number(changeset, _attrs) do
-    changeset
-    |> validate_format(:phone_number, ~r/^98[0-9]{8}$/, message: "must be a valid phone number")
-    |> unique_constraint(:phone_number)
   end
 
   def registration_changeset(user, attrs, opts \\ []) do
@@ -74,7 +71,28 @@ defmodule VacationNest.Accounts.User do
     |> validate_name()
     |> validate_email(opts)
     |> validate_password(opts)
-    |> validate_phone_number
+    |> maybe_validate_phone_number(attrs)
+  end
+
+  defp maybe_validate_phone_number(changeset, _attrs) do
+    case get_field(changeset, :phone_number) do
+      nil ->
+        changeset
+
+      phone_number ->
+        Repo.get_by(User, phone_number: phone_number)
+        |> case do
+          nil ->
+            changeset
+            |> unique_constraint(:phone_number)
+            |> validate_format(:phone_number, ~r/^9[678][0-9]{8}$/,
+              message: "must be a valid phone number"
+            )
+
+          _ ->
+            add_error(changeset, :phone_number, "has already been taken")
+        end
+    end
   end
 
   defp validate_name(changeset) do
@@ -83,7 +101,7 @@ defmodule VacationNest.Accounts.User do
         changeset
 
       _name ->
-        validate_format(changeset, :name, ~r/^[a-zA-Z]+ [a-zA-Z]+$/,
+        validate_format(changeset, :name, ~r/^[a-zA-Z]+( [a-zA-Z]+){1,2}$/,
           message: "must be alphabetical characters only"
         )
     end
@@ -92,25 +110,18 @@ defmodule VacationNest.Accounts.User do
   defp validate_email(changeset, opts) do
     changeset
     |> validate_required([:email])
-    |> validate_format(:email, ~r/^[a-zA-Z0-9_.]+@gmail.[a-zA-Z]+$/,
+    |> validate_format(:email, ~r/^[a-zA-Z0-9_.]+@gmail.[a-zA-Z]{2,3}$/,
       message: "please enter correct mail address"
     )
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
   end
 
-  defp validate_phone_number(changeset) do
-    changeset
-    |> validate_required([:phone_number])
-    |> validate_format(:phone_number, ~r/^98[0-9]{8}$/, message: "must be a valid phone number")
-    |> unique_constraint(:phone_number)
-  end
-
   defp validate_password(changeset, opts) do
     changeset
     |> validate_required([:password])
     |> validate_confirmation(:password, message: "does not match password")
-    |> validate_length(:password, min: 8, max: 72)
+    |> validate_length(:password, min: 6, max: 72)
     |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/,
       message: "at least one digit or punctuation character"
     )
