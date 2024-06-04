@@ -1,4 +1,4 @@
-defmodule VacationNestWeb.Admin.UsersLive.Edit do
+defmodule VacationNestWeb.Admin.UsersLive.EditComponent do
   use VacationNestWeb, :live_component
 
   alias VacationNest.Accounts
@@ -13,7 +13,7 @@ defmodule VacationNestWeb.Admin.UsersLive.Edit do
 
       <.simple_form
         for={@form}
-        id="user-edit-form"
+        id="admin-user-edit-form"
         phx-target={@myself}
         phx-change="validate"
         phx-submit="save"
@@ -62,15 +62,7 @@ defmodule VacationNestWeb.Admin.UsersLive.Edit do
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
-    save_user(
-      socket,
-      socket.assigns.action,
-      user_params
-    )
-  end
-
-  defp save_user(socket, :edit, user_params) do
-    case Accounts.update_user(socket.assigns.user, user_params) do
+    case Accounts.update_user(socket.assigns.user, user_params) |> IO.inspect() do
       {:ok, user} ->
         notify_parent({:saved, user})
 

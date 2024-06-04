@@ -25,6 +25,13 @@ defmodule VacationNestWeb.BookingsLive.Index do
           <.link
             :if={@current_user.role == :admin}
             class="text-white bg-[#325D79] hover:bg-[#527D99] focus:ring-4 focus:ring-[#325D79] font-medium rounded-lg px-5 py-3 mx-1 my-1.5 focus:outline-none transition duration-300"
+            patch={~p"/hotel/bookings/#{booking.id}/edit"}
+          >
+            Edit
+          </.link>
+          <.link
+            :if={@current_user.role == :admin}
+            class="text-white bg-[#325D99] hover:bg-[#527D99] focus:ring-4 focus:ring-[#325D99] font-medium rounded-lg px-5 py-3 mx-1 my-1.5 focus:outline-none transition duration-300"
             patch={~p"/hotel/bookings/#{booking.id}"}
           >
             Show
@@ -42,6 +49,14 @@ defmodule VacationNestWeb.BookingsLive.Index do
             Accept
           </.button>
           <.button
+            :if={@current_user.role == :admin and booking.status == :on_going}
+            phx-click="complete_booking"
+            phx-value-id={booking.id}
+            class="text-white bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg px-5 py-1.5 transition duration-300"
+          >
+            Finish
+          </.button>
+          <.button
             :if={
               @current_user.role == :admin and booking.status in [:requested, :confirmed, :on_going]
             }
@@ -55,6 +70,20 @@ defmodule VacationNestWeb.BookingsLive.Index do
         </:action>
       </.table>
     </div>
+    <.modal
+      :if={@live_action == :edit}
+      id="booking-edit-modal"
+      show
+      on_cancel={JS.patch(~p"/hotel/bookings")}
+    >
+      <.live_component
+        module={VacationNestWeb.BookingsLive.EditComponent}
+        id={:edit}
+        action={@live_action}
+        booking={@booking}
+        patch={~p"/hotel/bookings"}
+      />
+    </.modal>
     """
   end
 
@@ -67,6 +96,10 @@ defmodule VacationNestWeb.BookingsLive.Index do
 
   defp apply_action(socket, :my_bookings, _params) do
     socket |> assign(:bookings, Rooms.list_bookings(socket.assigns.current_user.id))
+  end
+
+  defp apply_action(socket, :edit, %{"id" => id}) do
+    socket |> assign(:booking, Rooms.get_booking!(id))
   end
 
   defp apply_action(socket, _index, _params) do
@@ -90,7 +123,16 @@ defmodule VacationNestWeb.BookingsLive.Index do
     {:noreply, socket |> put_flash(:info, "Booking request cancelled")}
   end
 
-  def handle_info({__MODULE__, :update}, socket) do
+  def handle_event("complete_booking", %{"id" => id}, socket) do
+    Rooms.get_booking!(id)
+    |> Rooms.update_booking(%{status: :completed})
+
+    notify_self(:update)
+
+    {:noreply, socket |> put_flash(:info, "Booking completed")}
+  end
+
+  def handle_info({_, :update}, socket) do
     if socket.assigns.current_user.role == :admin do
       {:noreply, socket |> assign(:bookings, Rooms.list_bookings())}
     else

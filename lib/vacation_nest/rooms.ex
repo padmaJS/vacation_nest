@@ -75,7 +75,7 @@ defmodule VacationNest.Rooms do
   def list_room_types(params) do
     params =
       params
-      |> Map.put("page_size", 9)
+      |> Map.put("page_size", 8)
 
     case Flop.validate_and_run(RoomType, params, for: RoomType) do
       {:ok, {room_types, meta}} ->
@@ -188,13 +188,18 @@ defmodule VacationNest.Rooms do
   end
 
   def list_bookings(user_id) do
-    Repo.all(from b in Booking, where: b.user_id == ^user_id, order_by: [desc: b.updated_at])
-    |> Repo.preload(rooms: [:room_type])
+    Repo.all(
+      from b in Booking,
+        where: b.user_id == ^user_id,
+        order_by: [desc: b.updated_at],
+        preload: [:user, rooms: [:room_type]]
+    )
   end
 
   def list_bookings() do
-    Repo.all(from b in Booking, order_by: [desc: b.updated_at])
-    |> Repo.preload([:user, rooms: [:room_type]])
+    Repo.all(
+      from b in Booking, order_by: [desc: b.updated_at], preload: [:user, rooms: [:room_type]]
+    )
   end
 
   def update_booking(booking, attrs) do
@@ -207,12 +212,16 @@ defmodule VacationNest.Rooms do
     Repo.get!(Booking, id) |> Repo.preload([:user, :rooms])
   end
 
+  def change_booking(%Booking{} = booking, attrs \\ %{}) do
+    Booking.changeset(booking, attrs)
+  end
+
   def list_on_going_bookings_between_dates(user, check_in_day, check_out_day) do
     Booking
     |> where([b], b.user_id == ^user.id)
     |> where(
       [b],
-      b.status in [:requested, :confirmed, :on_going] and
+      b.status in [:requested, :confirmed, :on_going] or
         ((b.check_out_day >= ^check_in_day and b.check_in_day <= ^check_in_day) or
            (b.check_out_day >= ^check_in_day and b.check_out_day <= ^check_out_day) or
            (b.check_in_day >= ^check_in_day and b.check_out_day <= ^check_out_day))
@@ -231,7 +240,7 @@ defmodule VacationNest.Rooms do
   def list_rooms(params) do
     params =
       params
-      |> Map.put("page_size", 9)
+      |> Map.put("page_size", 8)
 
     case Flop.validate_and_run(Room, params, for: Room) do
       {:ok, {rooms, meta}} ->

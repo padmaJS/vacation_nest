@@ -99,8 +99,8 @@ defmodule VacationNestWeb.Router do
       live "/edit_amenities_images", HomeLive.Index, :amenities_images
 
       live "/hotel/bookings", BookingsLive.Index, :index
-
       live "/hotel/bookings/:id", BookingsLive.Show, :show
+      live "/hotel/bookings/:id/edit", BookingsLive.Index, :edit
 
       scope "/admin", Admin do
         live "/users", UsersLive.Index, :index

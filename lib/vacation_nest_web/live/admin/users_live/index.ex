@@ -69,7 +69,7 @@ defmodule VacationNestWeb.Admin.UsersLive.Index do
       on_cancel={JS.patch(~p"/admin/users")}
     >
       <.live_component
-        module={VacationNestWeb.Admin.UsersLive.Edit}
+        module={VacationNestWeb.Admin.UsersLive.EditComponent}
         id={:edit}
         action={@live_action}
         user={@user}

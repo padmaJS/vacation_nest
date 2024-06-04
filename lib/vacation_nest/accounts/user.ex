@@ -89,8 +89,12 @@ defmodule VacationNest.Accounts.User do
               message: "must be a valid phone number"
             )
 
-          _ ->
-            add_error(changeset, :phone_number, "has already been taken")
+          user ->
+            if user.id == get_field(changeset, :id) do
+              changeset
+            else
+              add_error(changeset, :phone_number, "has already been taken")
+            end
         end
     end
   end

@@ -367,7 +367,7 @@ defmodule VacationNest.Accounts do
   end
 
   def list_users(params \\ %{"order_by" => ["inserted_at"], "order_directions" => ["asc"]}) do
-    params = params |> Map.put("page_size", 9)
+    params = params |> Map.put("page_size", 8)
 
     case Flop.validate_and_run(User, params, for: User) do
       {:ok, {users, meta}} ->
