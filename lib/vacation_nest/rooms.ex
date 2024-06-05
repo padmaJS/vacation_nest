@@ -178,7 +178,7 @@ defmodule VacationNest.Rooms do
   end
 
   def create_booking(attrs) do
-    %Booking{} |> Booking.changeset(attrs) |> Repo.insert()
+    %Booking{hotel_id: Hotels.get_hotel().id} |> Booking.changeset(attrs) |> Repo.insert()
   end
 
   def create_bookings_rooms(attrs) do
@@ -256,7 +256,7 @@ defmodule VacationNest.Rooms do
   end
 
   def create_room(attrs) do
-    case %Room{} |> Room.changeset(attrs) |> Repo.insert() do
+    case %Room{hotel_id: Hotels.get_hotel().id} |> Room.changeset(attrs) |> Repo.insert() do
       {:ok, room} ->
         {:ok, Repo.preload(room, :room_type)}
 

@@ -14,7 +14,7 @@ defmodule VacationNest.Hotels.RoomType do
     field :image, :string
     field :description, :string
 
-    has_many :rooms, VacationNest.Hotels.Room
+    has_many :rooms, VacationNest.Hotels.Room, on_delete: :delete_all
 
     timestamps()
   end

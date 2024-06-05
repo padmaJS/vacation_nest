@@ -20,8 +20,8 @@ defmodule VacationNest.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
-    has_many :reviews, VacationNest.Hotels.Review
-    has_many :bookings, VacationNest.Hotels.Booking
+    has_many :reviews, VacationNest.Hotels.Review, on_delete: :delete_all
+    has_many :bookings, VacationNest.Hotels.Booking, on_delete: :delete_all
 
     timestamps()
   end

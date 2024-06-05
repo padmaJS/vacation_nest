@@ -5,7 +5,7 @@ defmodule VacationNest.Hotels do
   alias VacationNest.Hotels.{Review, Hotel}
 
   def create_review(attrs) do
-    %Review{}
+    %Review{hotel_id: get_hotel().id}
     |> Review.changeset(attrs)
     |> Repo.insert()
   end
@@ -36,9 +36,18 @@ defmodule VacationNest.Hotels do
   end
 
   def get_rating() do
-    Review
-    |> select([r], avg(r.rating))
-    |> Repo.one() || 0.0
+    query =
+      Review
+      |> select([r], avg(r.rating))
+
+    Repo.one(query)
+    |> case do
+      nil ->
+        0.0
+
+      val ->
+        val |> Decimal.to_float() || 0.0
+    end
   end
 
   def get_rating_count() do

@@ -12,6 +12,32 @@
 alias VacationNest.Repo
 now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 
+%VacationNest.Hotels.Hotel{id: id} =
+  %VacationNest.Hotels.Hotel{
+    name: "Vacation Nest",
+    address: "Nasamana-13, Bhaktapur, Nepal",
+    checkin_time: ~T[14:00:00],
+    checkout_time: ~T[11:00:00],
+    phone_number: "9841152450",
+    room_images: [
+      "/images/rooms/room1.jpeg",
+      "/images/rooms/room2.jpeg",
+      "/images/rooms/room3.jpeg",
+      "/images/rooms/room4.webp"
+    ],
+    amenities_images: [
+      "/images/amenities/amenities1.jpg",
+      "/images/amenities/amenities2.jpg",
+      "/images/amenities/amenities3.jpg",
+      "/images/amenities/amenities4.jpg",
+      "/images/amenities/corridor.jpg"
+    ],
+    email: "info@vacation_nest.com",
+    instagram_url: "https://www.instagram.com/vacation_nest/",
+    facebook_url: "https://www.facebook.com/vacation_nest/"
+  }
+  |> Repo.insert!()
+
 %VacationNest.Accounts.User{
   email: "admin@admin.com",
   name: "Admin admin",
@@ -67,48 +93,28 @@ double =
 [
   %VacationNest.Hotels.Room{
     room_number: 1,
-    room_type: single
+    room_type: single,
+    hotel_id: id
   },
   %VacationNest.Hotels.Room{
     room_number: 2,
-    room_type: single
+    room_type: single,
+    hotel_id: id
   },
   %VacationNest.Hotels.Room{
     room_number: 3,
-    room_type: double
+    room_type: double,
+    hotel_id: id
   },
   %VacationNest.Hotels.Room{
     room_number: 4,
-    room_type: double
+    room_type: double,
+    hotel_id: id
   },
   %VacationNest.Hotels.Room{
     room_number: 5,
-    room_type: double
+    room_type: double,
+    hotel_id: id
   }
 ]
 |> Enum.each(&Repo.insert!(&1))
-
-%VacationNest.Hotels.Hotel{
-  name: "Vacation Nest",
-  address: "Nasamana-13, Bhaktapur, Nepal",
-  checkin_time: ~T[14:00:00],
-  checkout_time: ~T[11:00:00],
-  phone_number: "9841152450",
-  room_images: [
-    "/images/rooms/room1.jpeg",
-    "/images/rooms/room2.jpeg",
-    "/images/rooms/room3.jpeg",
-    "/images/rooms/room4.webp"
-  ],
-  amenities_images: [
-    "/images/amenities/amenities1.jpg",
-    "/images/amenities/amenities2.jpg",
-    "/images/amenities/amenities3.jpg",
-    "/images/amenities/amenities4.jpg",
-    "/images/amenities/corridor.jpg"
-  ],
-  email: "info@vacation_nest.com",
-  instagram_url: "https://www.instagram.com/vacation_nest/",
-  facebook_url: "https://www.facebook.com/vacation_nest/"
-}
-|> Repo.insert!()

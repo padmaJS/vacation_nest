@@ -15,6 +15,10 @@ defmodule VacationNest.Hotels.Hotel do
     field :instagram_url, :string
     field :facebook_url, :string
 
+    has_many :reviews, VacationNest.Hotels.Review
+    has_many :rooms, VacationNest.Hotels.Room
+    has_many :bookings, VacationNest.Hotels.Booking
+
     timestamps()
   end
 

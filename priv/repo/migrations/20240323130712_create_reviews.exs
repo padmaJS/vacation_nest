@@ -7,7 +7,8 @@ defmodule VacationNest.Repo.Migrations.CreateReviews do
       add :rating, :integer
       add :comment, :text
 
-      add :user_id, references(:users, type: :uuid)
+      add :user_id, references(:users, type: :uuid, on_delete: :delete_all)
+      add :hotel_id, references(:hotels, type: :uuid, on_delete: :delete_all)
 
       timestamps()
     end

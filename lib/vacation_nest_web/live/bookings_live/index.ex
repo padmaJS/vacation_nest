@@ -13,9 +13,9 @@ defmodule VacationNestWeb.BookingsLive.Index do
         </:col>
         <:col :let={booking} label="Amount"><%= booking.total_amount %></:col>
         <:col :let={booking} label="Room">
-          <%= Enum.at(booking.rooms, 0) |> Map.get(:room_type) |> Map.get(:type) |> humanize_text %> X <%= Enum.count(
-            booking.rooms
-          ) %>
+          <%= if booking.rooms != [] do
+            Enum.at(booking.rooms, 0) |> Map.get(:room_type) |> Map.get(:type) |> humanize_text
+          end %> X <%= Enum.count(booking.rooms) %>
         </:col>
         <:col :let={booking} label="Check in day"><%= booking.check_in_day %></:col>
         <:col :let={booking} label="Check out day"><%= booking.check_out_day %></:col>
