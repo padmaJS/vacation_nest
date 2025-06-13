@@ -1,0 +1,20 @@
+{
+  "name": "VN Development Container",
+  "dockerFile": "Dockerfile",
+  "extensions": [
+    "jakebecker.elixir-ls",
+    "phoenixframework.phoenix"
+  ],
+  "settings": {
+    "elixirLS.dialyzerEnabled": true,
+    "elixirLS.fetchDeps": true,
+    "editor.formatOnSave": true,
+    "[elixir]": {
+        "editor.defaultFormatter": "jakebecker.elixir-ls"
+    },
+    "[heex]": {
+        "editor.defaultFormatter": "jakebecker.elixir-ls"
+    }
+  }
+
+}
